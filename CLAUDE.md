@@ -37,22 +37,34 @@ The user (Tom) is head of AI transportation and DevEx, has a Rugby Sevens backgr
 
 ### During Development
 
-1. **Test frequently**: `npm test` or `npm run test:watch`
-2. **Use relevant tools**:
+1. **Lint on every change**: `npm run lint` - Fix all errors before committing
+2. **Test frequently**: `npm test` or `npm run test:watch`
+3. **Use relevant tools**:
+   - ESLint for code quality (must pass on every commit)
    - Playwright for E2E tests
    - Chrome DevTools for debugging
    - Jest for unit tests
-   - ESLint for code quality
-3. **Keep commits atomic** - one logical change per commit
-4. **Write descriptive commit messages**
+4. **Keep commits atomic** - one logical change per commit
+5. **Write descriptive commit messages**
+
+**IMPORTANT**: Always run `npm run lint` before committing. All lint errors must be fixed. Zero tolerance for lint failures.
 
 ### Before Creating PR
 
-1. **All tests pass**: `npm test`
-2. **No lint errors**: `npm run lint`
+1. **CRITICAL: No lint errors**: `npm run lint` - Must pass with zero errors
+2. **All tests pass**: `npm test`
 3. **Build succeeds**: `npm run build`
 4. **Manual testing done**: Load extension, test on real GitHub PR
 5. **Documentation updated**: Code comments, README if needed
+
+**Pre-commit Checklist**:
+```bash
+npm run lint    # Must exit with code 0
+npm test        # Must show all tests passing
+npm run build   # Must complete without errors
+```
+
+If any of these fail, **DO NOT COMMIT**. Fix all issues first.
 
 ### After PR Merged
 
@@ -508,6 +520,46 @@ async function postComment(content) {
 }
 ```
 
+## Linting and Code Quality
+
+### ESLint Must Pass
+
+**Zero tolerance policy**: All code must pass `npm run lint` with zero errors before committing.
+
+```bash
+# Check for lint errors
+npm run lint
+
+# Auto-fix fixable issues
+npm run lint -- --fix
+```
+
+**Common ESLint Errors to Avoid**:
+- Unused variables (delete them or prefix with `_`)
+- Missing semicolons (add them)
+- Console statements in production (use conditional logging)
+- Undefined variables (import or declare them)
+- Inconsistent quotes (use single quotes)
+- Trailing whitespace (remove it)
+
+**If ESLint fails**:
+1. Read the error message carefully
+2. Fix the issue (don't disable the rule)
+3. Run `npm run lint` again
+4. Repeat until it passes
+5. Only then run tests and commit
+
+### Auto-fix Workflow
+
+```bash
+# Recommended: Auto-fix before every commit
+npm run lint -- --fix
+npm run lint  # Verify it passes
+npm test      # Run tests
+git add .
+git commit -m "..."
+```
+
 ## Code Style Guidelines
 
 ### Naming Conventions
@@ -598,13 +650,16 @@ element.textContent = userInput;
 ## Useful Commands
 
 ```bash
-# Development
+# Development (IN THIS ORDER)
 npm install                 # Install dependencies
-npm test                   # Run all tests
-npm run test:watch         # Watch mode
+npm run lint               # FIRST: Lint code (must pass)
+npm test                   # SECOND: Run all tests
+npm run test:watch         # Watch mode for development
 npm run test:e2e          # E2E tests only
-npm run lint              # Lint code
 npm run build             # Build extension
+
+# Recommended workflow
+npm run lint && npm test && npm run build  # Run all checks
 
 # Git workflow
 git worktree list         # List all worktrees
