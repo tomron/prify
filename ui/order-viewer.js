@@ -423,7 +423,8 @@ function createOrderCard(order, onSelectOrder) {
   // Apply button
   if (onSelectOrder) {
     const applyBtn = document.createElement('button');
-    applyBtn.className = 'pr-reorder-btn pr-reorder-btn-secondary pr-viewer-apply-btn';
+    applyBtn.className =
+      'pr-reorder-btn pr-reorder-btn-secondary pr-viewer-apply-btn';
     applyBtn.textContent = 'Apply This Order';
     applyBtn.addEventListener('click', () => {
       onSelectOrder(order.order);
@@ -447,8 +448,10 @@ function formatTimestamp(date) {
   const diffDays = Math.floor(diffMs / 86400000);
 
   if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+  if (diffMins < 60)
+    return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
   if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
 
   return date.toLocaleDateString();

@@ -118,8 +118,9 @@
 
 .pr-viewer-file-path {
   flex: 1;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-    'Liberation Mono', monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
   font-size: 13px;
   color: #24292f;
 }
@@ -162,8 +163,9 @@
 
 .pr-viewer-conflict-file {
   flex: 1;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-    'Liberation Mono', monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
   font-weight: 600;
 }
 

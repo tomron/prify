@@ -216,8 +216,8 @@ describe('Order Viewer Modal', () => {
       const orderCards = document.querySelectorAll('.pr-viewer-order-card');
       expect(orderCards.length).toBe(2);
 
-      const userNames = Array.from(orderCards).map((card) =>
-        card.querySelector('.pr-viewer-order-user').textContent
+      const userNames = Array.from(orderCards).map(
+        (card) => card.querySelector('.pr-viewer-order-user').textContent
       );
       expect(userNames).toContain('alice');
       expect(userNames).toContain('bob');
@@ -227,7 +227,11 @@ describe('Order Viewer Modal', () => {
 
     it('should call onSelectOrder when apply button clicked', () => {
       const orders = [
-        { user: 'alice', order: ['a.js', 'b.js'], timestamp: '2024-01-01T00:00:00Z' },
+        {
+          user: 'alice',
+          order: ['a.js', 'b.js'],
+          timestamp: '2024-01-01T00:00:00Z',
+        },
       ];
 
       let called = false;
@@ -266,7 +270,7 @@ describe('Order Viewer Modal', () => {
         closeCalled = true;
       };
 
-      const modal = createOrderViewerModal({
+      createOrderViewerModal({
         orders: [],
         consensus: [],
         metadata: {
@@ -296,7 +300,7 @@ describe('Order Viewer Modal', () => {
         closeCalled = true;
       };
 
-      const modal = createOrderViewerModal({
+      createOrderViewerModal({
         orders: [],
         consensus: [],
         metadata: {
