@@ -558,6 +558,287 @@ npm run benchmark
 
 ---
 
+## Phase 1.5: UX Enhancements (Post-MVP)
+
+### Task 1.11: Undo/Redo Functionality
+**ID**: `TASK-013-UX`
+**Branch**: `feature/013-undo-redo`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-004 (Storage)
+
+**Description:**
+Implement undo/redo functionality for file reordering with keyboard shortcuts.
+
+**Work Items:**
+1. Add history stack to storage layer
+2. Implement undo() and redo() methods
+3. Add Ctrl+Z / Ctrl+Y keyboard shortcuts
+4. Update UI to show undo/redo buttons
+5. Limit history to last 20 actions
+6. Clear history on new PR navigation
+7. Write unit and E2E tests
+
+**Definition of Done:**
+- [ ] Undo/redo works for all reorder operations
+- [ ] Keyboard shortcuts functional
+- [ ] History persists during session
+- [ ] UI buttons update state correctly
+- [ ] Unit tests for history management
+- [ ] E2E tests for keyboard shortcuts
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: History stack operations
+- E2E: Undo after reorder
+- E2E: Redo after undo
+- E2E: Ctrl+Z / Ctrl+Y shortcuts
+
+---
+
+### Task 1.12: Quick Sort Presets
+**ID**: `TASK-014-UX`
+**Branch**: `feature/014-sort-presets`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-003 (Parser), TASK-005 (DOM Manipulator)
+
+**Description:**
+Add quick sort presets for common ordering patterns.
+
+**Work Items:**
+1. Create `utils/presets.js`
+2. Implement sorting presets:
+   - Alphabetical (A-Z)
+   - Reverse Alphabetical (Z-A)
+   - By file extension
+   - README first, tests last
+   - New files first
+   - Most changed first
+3. Add preset dropdown to UI
+4. Save user's last used preset
+5. Write tests for each preset
+
+**Definition of Done:**
+- [ ] All 6 presets implemented
+- [ ] Preset selector in UI
+- [ ] Last preset remembered
+- [ ] Each preset tested
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Each preset algorithm
+- E2E: Apply preset and verify order
+
+---
+
+### Task 1.13: Export/Import Orders
+**ID**: `TASK-015-UX`
+**Branch**: `feature/015-export-import`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-004 (Storage)
+
+**Description:**
+Enable export/import of orders for users without write permissions.
+
+**Work Items:**
+1. Implement order export to JSON
+2. Implement order import from JSON
+3. Generate shareable URL (base64 encoded)
+4. Add export/import buttons to UI
+5. Add copy-to-clipboard for URLs
+6. Handle import validation
+7. Write tests
+
+**Definition of Done:**
+- [ ] Export downloads JSON file
+- [ ] Import validates and loads JSON
+- [ ] Shareable URL generation works
+- [ ] Copy-to-clipboard functional
+- [ ] Error handling for invalid imports
+- [ ] E2E tests cover workflow
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: JSON serialization/deserialization
+- E2E: Export, import, verify order
+- E2E: Share via URL
+
+---
+
+### Task 1.14: Keyboard Shortcuts
+**ID**: `TASK-016-UX`
+**Branch**: `feature/016-keyboard-shortcuts`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-009 (Order Viewer)
+
+**Description:**
+Implement comprehensive keyboard shortcuts for power users.
+
+**Work Items:**
+1. Create `utils/keyboard.js` hotkey handler
+2. Implement shortcuts:
+   - Ctrl+Shift+R: Open reorder modal
+   - Ctrl+Shift+V: View all orders
+   - Ctrl+Shift+C: Apply consensus
+   - Esc: Close modal
+   - ↑/↓: Navigate files
+   - Ctrl+↑/↓: Move file up/down
+3. Add keyboard shortcut help modal (?)
+4. Prevent conflicts with GitHub shortcuts
+5. Write E2E tests
+
+**Definition of Done:**
+- [ ] All shortcuts functional
+- [ ] Help modal shows all shortcuts
+- [ ] No conflicts with GitHub
+- [ ] Shortcuts work in all modals
+- [ ] E2E tests for each shortcut
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Each keyboard shortcut
+- E2E: Modal navigation
+- E2E: No GitHub conflict test
+
+---
+
+### Task 1.15: Collaborative Annotations
+**ID**: `TASK-017-UX`
+**Branch**: `feature/017-annotations`
+**Priority**: P3 (Nice to have)
+**Dependencies**: TASK-007 (GitHub Comments)
+
+**Description:**
+Allow users to add explanatory notes to their file orders.
+
+**Work Items:**
+1. Extend order comment format with annotations
+2. Add annotation input to reorder modal
+3. Display annotations in order viewer
+4. Show annotations as tooltips in consensus view
+5. Update storage to handle annotations
+6. Write tests
+
+**Definition of Done:**
+- [ ] Users can add notes per file
+- [ ] Annotations stored in comments
+- [ ] Annotations displayed in viewer
+- [ ] Tooltips show annotations
+- [ ] Tests cover annotation flow
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Annotation serialization
+- E2E: Add, save, view annotations
+- E2E: Annotations in consensus view
+
+---
+
+### Task 1.16: Order Diff Visualization
+**ID**: `TASK-018-UX`
+**Branch**: `feature/018-order-diff`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-009 (Order Viewer)
+
+**Description:**
+Visual diff showing how two orders differ.
+
+**Work Items:**
+1. Create diff algorithm for order comparison
+2. Design diff visualization UI (arrows, colors)
+3. Add diff view to order viewer modal
+4. Highlight moved files
+5. Show position changes numerically
+6. Write tests
+
+**Definition of Done:**
+- [ ] Diff shows file movements
+- [ ] Visual representation clear
+- [ ] Works for 100+ file orders
+- [ ] Performance acceptable
+- [ ] E2E tests verify visuals
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Diff algorithm
+- E2E: View diff between orders
+- E2E: Diff with large file count
+
+---
+
+### Task 1.17: Icon & Visual Assets
+**ID**: `TASK-019-UX`
+**Branch**: `feature/019-icons`
+**Priority**: P1 (Critical for release)
+**Dependencies**: None
+
+**Description:**
+Create all required visual assets for extension.
+
+**Work Items:**
+1. Design extension icon (16x16, 48x48, 128x128)
+2. Create icons/ directory
+3. Export icon in multiple formats
+4. Create badge icons for status
+5. Design loading spinner
+6. Create promotional images (440x280, 920x680, 1400x560)
+7. Screenshot generation for Web Store
+
+**Definition of Done:**
+- [ ] All icon sizes created
+- [ ] Icons follow Chrome guidelines
+- [ ] Badge icons functional
+- [ ] Promotional images ready
+- [ ] Screenshots captured
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Icons render correctly
+- Manual: Visual approval
+
+---
+
+### Task 1.18: Loading States & Feedback
+**ID**: `TASK-020-UX`
+**Branch**: `feature/020-loading-states`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-010 (Content Script)
+
+**Description:**
+Add loading indicators and success/error feedback.
+
+**Work Items:**
+1. Create loading spinner component
+2. Add loading states to all async operations
+3. Implement toast notification system
+4. Add success confirmation animations
+5. Add error message display
+6. Add skeleton screens for empty states
+7. Write tests
+
+**Definition of Done:**
+- [ ] Loading spinners on all async ops
+- [ ] Toast notifications work
+- [ ] Success/error feedback clear
+- [ ] Skeleton screens implemented
+- [ ] Animations smooth
+- [ ] E2E tests verify feedback
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Loading state appears
+- E2E: Success toast after save
+- E2E: Error toast on failure
+
+---
+
 ## Phase 2: Smart Defaults
 
 ### Task 2.1: Dependency Graph Parser
@@ -767,11 +1048,146 @@ Track user interactions for learning patterns.
 
 ---
 
-## Bug Fix Tasks (As Needed)
+## Bug Fix Tasks (Critical Issues)
+
+### BUG-001: Race Condition with Dynamic File Loading
+**ID**: `BUG-001`
+**Branch**: `bugfix/001-race-condition-dynamic-loading`
+**Priority**: P1 (Critical)
+**Dependencies**: TASK-005 (DOM Manipulator)
+
+**Description:**
+GitHub lazy-loads files in large PRs, causing parser to miss files or reorder to fail.
+
+**Root Cause:**
+- Parser runs once on page load
+- GitHub dynamically adds files as user scrolls
+- No MutationObserver to detect new files
+
+**Work Items:**
+1. Write failing test that reproduces issue
+2. Implement MutationObserver in dom-manipulator.js
+3. Add debouncing to prevent excessive re-parsing
+4. Re-apply saved order when new files appear
+5. Add unit and E2E tests
+6. Add performance benchmark
+
+**Definition of Done:**
+- [ ] Bug reproduced with test
+- [ ] MutationObserver implemented
+- [ ] Debouncing prevents performance issues
+- [ ] Order preserved with dynamic loading
+- [ ] Tests pass
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+---
+
+### BUG-002: No Cleanup on Page Navigation
+**ID**: `BUG-002`
+**Branch**: `bugfix/002-navigation-cleanup`
+**Priority**: P1 (Critical)
+**Dependencies**: TASK-010 (Content Script)
+
+**Description:**
+Extension leaves artifacts (event listeners, DOM elements) when navigating away from PR.
+
+**Root Cause:**
+- No navigation listener
+- No cleanup function
+- Memory leaks accumulate
+
+**Work Items:**
+1. Add navigation event listener
+2. Implement cleanup() function
+3. Remove injected UI elements
+4. Clear event listeners
+5. Cancel pending async operations
+6. Write memory leak test
+7. Add E2E navigation test
+
+**Definition of Done:**
+- [ ] Cleanup function implemented
+- [ ] No memory leaks on navigation
+- [ ] UI elements removed
+- [ ] Event listeners cleared
+- [ ] Tests pass
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+---
+
+### BUG-003: Input Sanitization Missing
+**ID**: `BUG-003`
+**Branch**: `bugfix/003-input-sanitization`
+**Priority**: P0 (Security)
+**Dependencies**: TASK-006 (UI), TASK-007 (GitHub Comments)
+
+**Description:**
+User input (file paths, annotations, orders) not sanitized, XSS vulnerability.
+
+**Root Cause:**
+- Direct innerHTML usage
+- No input validation
+- No CSP enforcement
+
+**Work Items:**
+1. Audit all user input points
+2. Replace innerHTML with textContent
+3. Implement Shadow DOM for UI isolation
+4. Add input validation/sanitization
+5. Apply strict CSP
+6. Write security tests
+7. Security audit
+
+**Definition of Done:**
+- [ ] All inputs sanitized
+- [ ] Shadow DOM isolation
+- [ ] CSP enforced
+- [ ] Security tests pass
+- [ ] No XSS vulnerabilities
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+---
+
+### BUG-004: Parser Fails on New GitHub DOM
+**ID**: `BUG-004`
+**Branch**: `bugfix/004-parser-robustness`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-003 (Parser)
+
+**Description:**
+Parser may break if GitHub changes DOM structure, no error handling or fallback.
+
+**Root Cause:**
+- Parser assumes specific DOM structure
+- No error boundaries
+- No version detection
+
+**Work Items:**
+1. Add comprehensive error handling to parser
+2. Implement DOM structure detection
+3. Add fallback selectors (already partially done)
+4. Add graceful degradation
+5. Add error reporting/logging
+6. Create test suite with mock DOMs
+7. Add monitoring for GitHub changes
+
+**Definition of Done:**
+- [ ] Parser has error boundaries
+- [ ] Fallbacks work correctly
+- [ ] Graceful degradation tested
+- [ ] Error logging functional
+- [ ] Tests with various DOM structures
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+---
 
 ### Bug Fix Template
-**ID**: `BUG-XXX`  
-**Branch**: `bugfix/XXX-short-description`  
+**ID**: `BUG-XXX`
+**Branch**: `bugfix/XXX-short-description`
 **Priority**: Varies
 
 **Process:**

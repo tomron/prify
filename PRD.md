@@ -37,6 +37,18 @@ A Chrome extension that allows collaborative reordering of PR files with zero ba
 - Apply consensus automatically when multiple orders exist
 - View all individual orders and switch between them
 - Local storage fallback for offline/no-permissions scenarios
+- **NEW**: Undo/Redo functionality for mistake recovery
+- **NEW**: Quick sort presets (alphabetical, by extension, README first, etc.)
+- **NEW**: Export/Import orders for users without write permissions
+- **NEW**: Keyboard shortcuts for power users (Ctrl+Shift+R to reorder, etc.)
+
+#### Phase 1.5: Enhanced UX (Post-MVP)
+- **NEW**: Collaborative annotations (explain why files are ordered a certain way)
+- **NEW**: Order diff visualization (show how orders differ visually)
+- **NEW**: Real-time collaboration indicator (show active reviewers)
+- **NEW**: Order templates (save common patterns like "Frontend PR", "Bugfix PR")
+- **NEW**: Visual file tree view (alternative to flat list)
+- **NEW**: Statistics dashboard (usage metrics, time saved, consensus rates)
 
 #### Phase 2: Smart Defaults
 - Algorithm-based initial ordering (replaces alphabetical)
@@ -46,6 +58,7 @@ A Chrome extension that allows collaborative reordering of PR files with zero ba
   - Logical grouping (tests with implementation)
   - Directory depth (shallow to deep)
 - User preference for default strategy
+- **NEW**: AI-powered order suggestions using LLMs (analyze PR description + diffs)
 
 #### Phase 3: Learning System
 - Track user reordering patterns
@@ -291,11 +304,15 @@ pr-file-reorder/
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| GitHub DOM changes break extension | High | Comprehensive selectors, graceful degradation, automated testing |
-| Comment spam concerns | Medium | Hidden comments, compression, version tracking |
-| Consensus conflicts | Low | Clear UI showing all orders, easy switching |
-| Performance with large PRs (500+ files) | Medium | Virtual scrolling, lazy loading, algorithm optimization |
-| Users without write permissions | Low | Local storage fallback, share via URL |
+| GitHub DOM changes break extension | High | Comprehensive selectors, graceful degradation, automated testing, DOM change detection |
+| Comment spam concerns | Medium | Hidden comments, compression, version tracking, rate limiting |
+| Consensus conflicts | Low | Clear UI showing all orders, easy switching, confidence scores |
+| Performance with large PRs (500+ files) | Medium | Virtual scrolling, lazy loading, algorithm optimization, caching |
+| Users without write permissions | Low | Local storage fallback, share via URL, export/import functionality |
+| **NEW**: XSS vulnerabilities | High | Shadow DOM isolation, strict CSP, input sanitization |
+| **NEW**: Race conditions with dynamic loading | Medium | MutationObserver, debounced re-parsing, operation queuing |
+| **NEW**: No user onboarding | Medium | First-time tutorial, inline help, empty states with guidance |
+| **NEW**: Lack of error feedback | Medium | Toast notifications, loading states, user-friendly error messages |
 
 ## Future Enhancements
 
@@ -316,6 +333,11 @@ pr-file-reorder/
 3. Should consensus require minimum threshold (e.g., 3+ orders)?
 4. Rate limiting for comment posting (GitHub API limits)?
 5. Versioning strategy for comment format changes?
+6. **NEW**: Should we add TypeScript for type safety? (Trade-off: complexity vs safety)
+7. **NEW**: What's the maximum PR size we should support? (500? 1000 files?)
+8. **NEW**: Should we implement conflict resolution when orders diverge significantly?
+9. **NEW**: How to handle accessibility for screen readers with dynamic reordering?
+10. **NEW**: Should annotations be part of consensus or separate?
 
 ## Appendix
 
