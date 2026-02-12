@@ -106,7 +106,7 @@ function handleReorderClick() {
       const prId = getPRId();
       if (prId) {
         await saveOrder(prId, newOrder);
-        
+
         // Post to GitHub comments
         await saveOrderEverywhere(newOrder, {
           postToGitHub: true,
@@ -183,7 +183,11 @@ async function applySavedOrder() {
     const consensus = calculateConsensus(orders, { excludeOutliers: false });
 
     if (consensus.length > 0) {
-      console.log('[PR-Reorder] Applying consensus order from', orders.length, 'user(s)');
+      console.log(
+        '[PR-Reorder] Applying consensus order from',
+        orders.length,
+        'user(s)'
+      );
       reorderFiles(consensus);
     }
   } catch (error) {
@@ -249,7 +253,9 @@ function observeNavigation() {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
       lastUrl = currentUrl;
-      console.log('[PR-Reorder] URL changed, checking if reinitialization needed...');
+      console.log(
+        '[PR-Reorder] URL changed, checking if reinitialization needed...'
+      );
       extensionLoaded = false;
       buttonsInjected = false;
       setTimeout(init, 500);
