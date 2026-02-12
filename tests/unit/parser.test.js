@@ -7,7 +7,10 @@ import {
   getFileMetadata,
   getFilesContainer,
 } from '../../utils/parser.js';
-import { createMockFileElement, createMockFilesContainer } from '../helpers/dom.js';
+import {
+  createMockFileElement,
+  createMockFilesContainer,
+} from '../helpers/dom.js';
 
 describe('parser', () => {
   describe('getFilesContainer', () => {
