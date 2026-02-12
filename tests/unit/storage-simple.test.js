@@ -7,6 +7,9 @@ import {
   loadOrder,
   CURRENT_VERSION,
   migrateData,
+  savePreference,
+  loadPreference,
+  deletePreference,
 } from '../../utils/storage.js';
 
 // Mock chrome API
@@ -104,6 +107,121 @@ describe('Storage Layer - Basic Tests', () => {
       const migrated = migrateData(currentData);
 
       expect(migrated).toEqual(currentData);
+    });
+  });
+
+  describe('savePreference', () => {
+    it('should save preference successfully', async () => {
+      let savedData = null;
+
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({ 'pr-reorder:preferences': {} });
+      };
+
+      global.chrome.storage.local.set = (data, callback) => {
+        savedData = data;
+        callback();
+      };
+
+      await savePreference('lastPreset', 'alphabetical');
+
+      expect(savedData).not.toBeNull();
+      expect(savedData['pr-reorder:preferences'].lastPreset).toBe(
+        'alphabetical'
+      );
+    });
+
+    it('should throw on invalid key', async () => {
+      await expect(savePreference('', 'value')).rejects.toThrow();
+    });
+
+    it('should merge with existing preferences', async () => {
+      let savedData = null;
+
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({
+          'pr-reorder:preferences': { existingKey: 'existingValue' },
+        });
+      };
+
+      global.chrome.storage.local.set = (data, callback) => {
+        savedData = data;
+        callback();
+      };
+
+      await savePreference('newKey', 'newValue');
+
+      expect(savedData['pr-reorder:preferences'].existingKey).toBe(
+        'existingValue'
+      );
+      expect(savedData['pr-reorder:preferences'].newKey).toBe('newValue');
+    });
+  });
+
+  describe('loadPreference', () => {
+    it('should load preference successfully', async () => {
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({
+          'pr-reorder:preferences': { lastPreset: 'alphabetical' },
+        });
+      };
+
+      const result = await loadPreference('lastPreset');
+
+      expect(result).toBe('alphabetical');
+    });
+
+    it('should return default value if not found', async () => {
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({ 'pr-reorder:preferences': {} });
+      };
+
+      const result = await loadPreference('missing', 'default');
+
+      expect(result).toBe('default');
+    });
+
+    it('should return null if not found and no default', async () => {
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({ 'pr-reorder:preferences': {} });
+      };
+
+      const result = await loadPreference('missing');
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw on invalid key', async () => {
+      await expect(loadPreference('')).rejects.toThrow();
+    });
+  });
+
+  describe('deletePreference', () => {
+    it('should delete preference successfully', async () => {
+      let savedData = null;
+
+      global.chrome.storage.local.get = (keys, callback) => {
+        callback({
+          'pr-reorder:preferences': {
+            toDelete: 'value',
+            toKeep: 'other',
+          },
+        });
+      };
+
+      global.chrome.storage.local.set = (data, callback) => {
+        savedData = data;
+        callback();
+      };
+
+      await deletePreference('toDelete');
+
+      expect(savedData['pr-reorder:preferences'].toDelete).toBeUndefined();
+      expect(savedData['pr-reorder:preferences'].toKeep).toBe('other');
+    });
+
+    it('should throw on invalid key', async () => {
+      await expect(deletePreference('')).rejects.toThrow();
     });
   });
 });
