@@ -6,13 +6,20 @@
 import { getCurrentOrder, reorderFiles } from './dom-manipulator.js';
 import { createReorderModal } from '../ui/reorder-modal.js';
 import { createOrderViewerModal } from '../ui/order-viewer.js';
+import { createKeyboardHelpModal } from '../ui/keyboard-help-modal.js';
 import { saveOrder } from '../utils/storage.js';
 import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
+import {
+  registerShortcut,
+  unregisterShortcut,
+  DEFAULT_SHORTCUTS,
+} from '../utils/keyboard.js';
 
 // Extension state
 let extensionLoaded = false;
 let buttonsInjected = false;
+let shortcutIds = [];
 
 /**
  * Initialize extension on GitHub PR pages
@@ -34,6 +41,9 @@ async function init() {
 
   // Load and apply saved order
   await applySavedOrder();
+
+  // Register keyboard shortcuts
+  registerKeyboardShortcuts();
 
   // Mark as loaded
   extensionLoaded = true;
@@ -235,12 +245,97 @@ async function main() {
 }
 
 /**
+ * Register keyboard shortcuts
+ */
+function registerKeyboardShortcuts() {
+  // Clear any existing shortcuts
+  shortcutIds.forEach((id) => unregisterShortcut(id));
+  shortcutIds = [];
+
+  // Ctrl+Shift+R: Open reorder modal
+  shortcutIds.push(
+    registerShortcut({
+      ...DEFAULT_SHORTCUTS.REORDER_MODAL,
+      handler: () => {
+        console.log('[PR-Reorder] Keyboard shortcut: Open reorder modal');
+        handleReorderClick();
+      },
+      scope: 'global',
+    })
+  );
+
+  // Ctrl+Shift+V: View all orders
+  shortcutIds.push(
+    registerShortcut({
+      ...DEFAULT_SHORTCUTS.VIEW_ORDERS,
+      handler: () => {
+        console.log('[PR-Reorder] Keyboard shortcut: View orders');
+        handleViewOrdersClick();
+      },
+      scope: 'global',
+    })
+  );
+
+  // Ctrl+Shift+C: Apply consensus
+  shortcutIds.push(
+    registerShortcut({
+      ...DEFAULT_SHORTCUTS.APPLY_CONSENSUS,
+      handler: async () => {
+        console.log('[PR-Reorder] Keyboard shortcut: Apply consensus');
+        await applySavedOrder();
+      },
+      scope: 'global',
+    })
+  );
+
+  // ?: Show keyboard shortcuts help
+  shortcutIds.push(
+    registerShortcut({
+      ...DEFAULT_SHORTCUTS.HELP,
+      handler: () => {
+        console.log('[PR-Reorder] Keyboard shortcut: Show help');
+        handleShowKeyboardHelp();
+      },
+      scope: 'global',
+    })
+  );
+
+  console.log(
+    '[PR-Reorder] Keyboard shortcuts registered:',
+    shortcutIds.length
+  );
+}
+
+/**
+ * Handle show keyboard help
+ */
+function handleShowKeyboardHelp() {
+  createKeyboardHelpModal({
+    onClose: () => {
+      console.log('[PR-Reorder] Keyboard help closed');
+    },
+  });
+}
+
+/**
+ * Cleanup extension on navigation
+ */
+function cleanup() {
+  // Unregister all shortcuts
+  shortcutIds.forEach((id) => unregisterShortcut(id));
+  shortcutIds = [];
+
+  console.log('[PR-Reorder] Extension cleaned up');
+}
+
+/**
  * Observe for GitHub navigation events
  */
 function observeNavigation() {
   // GitHub fires these events on navigation
   document.addEventListener('pjax:end', async () => {
     console.log('[PR-Reorder] Navigation detected, reinitializing...');
+    cleanup();
     extensionLoaded = false;
     buttonsInjected = false;
     await init();
@@ -255,12 +350,16 @@ function observeNavigation() {
       console.log(
         '[PR-Reorder] URL changed, checking if reinitialization needed...'
       );
+      cleanup();
       extensionLoaded = false;
       buttonsInjected = false;
       setTimeout(init, 500);
     }
   }).observe(document.body, { childList: true, subtree: true });
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanup);
 
 // Start the extension
 main().catch((error) => {

@@ -3,10 +3,7 @@
  * Calculate democratic consensus from multiple user file orders
  */
 
-import {
-  sortByAveragePosition,
-  calculateAveragePosition,
-} from '../utils/array-utils.js';
+import { sortByAveragePosition } from '../utils/array-utils.js';
 
 /**
  * Calculate consensus order from multiple user orders

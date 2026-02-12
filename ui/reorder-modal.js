@@ -38,21 +38,8 @@ export function createReorderModal(options = {}) {
   modal.appendChild(footer);
   overlay.appendChild(modal);
 
-  // Track drag state
-  let draggedElement = null;
-  let draggedIndex = null;
-
   // Setup drag and drop
-  setupDragAndDrop(fileList, {
-    onDragStart: (element, index) => {
-      draggedElement = element;
-      draggedIndex = index;
-    },
-    onDragEnd: () => {
-      draggedElement = null;
-      draggedIndex = null;
-    },
-  });
+  setupDragAndDrop(fileList);
 
   // Setup keyboard navigation
   setupKeyboardNavigation(fileList);
@@ -289,9 +276,8 @@ function createFileItem(metadata, index) {
 /**
  * Setup drag and drop behavior
  * @param {HTMLElement} list - File list element
- * @param {Object} callbacks - Event callbacks
  */
-function setupDragAndDrop(list, callbacks) {
+function setupDragAndDrop(list) {
   let dragOverItem = null;
 
   list.addEventListener('dragstart', (e) => {
@@ -301,11 +287,6 @@ function setupDragAndDrop(list, callbacks) {
     item.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', item.dataset.path);
-
-    const index = Array.from(list.children).indexOf(item);
-    if (callbacks.onDragStart) {
-      callbacks.onDragStart(item, index);
-    }
   });
 
   list.addEventListener('dragend', (e) => {
@@ -318,10 +299,6 @@ function setupDragAndDrop(list, callbacks) {
     list.querySelectorAll('.drag-over').forEach((el) => {
       el.classList.remove('drag-over');
     });
-
-    if (callbacks.onDragEnd) {
-      callbacks.onDragEnd();
-    }
   });
 
   list.addEventListener('dragover', (e) => {
