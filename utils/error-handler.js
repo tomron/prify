@@ -90,7 +90,7 @@ function getIconSVG(type) {
  * @param {Function} [options.onRetry] - Retry callback
  */
 export function handleError(error, options = {}) {
-  const { context = '', silent = false, onRetry } = options;
+  const { context = '', silent = false } = options;
 
   // Log error
   console.error(`[PR-Reorder] Error${context ? ` in ${context}` : ''}:`, error);
@@ -98,7 +98,7 @@ export function handleError(error, options = {}) {
   if (silent) return;
 
   // Determine error type and message
-  const { type, userMessage } = categorizeError(error, context);
+  const { userMessage } = categorizeError(error, context);
 
   // Show notification
   showNotification(userMessage, 'error', 10000);
@@ -113,7 +113,7 @@ export function handleError(error, options = {}) {
  * @param {string} context - Error context
  * @returns {Object} Error type and user message
  */
-function categorizeError(error, context) {
+function categorizeError(error, _context) {
   const message = error.message || String(error);
 
   // Network errors
@@ -249,7 +249,7 @@ export function validatePRId(prId) {
     throw new Error('Invalid PR ID');
   }
 
-  if (!/^[^\/]+\/[^\/]+\/\d+$/.test(prId)) {
+  if (!/^[^/]+\/[^/]+\/\d+$/.test(prId)) {
     throw new Error('PR ID must be in format org/repo/number');
   }
 }
@@ -287,7 +287,9 @@ export async function retry(fn, options = {}) {
     } catch (error) {
       lastError = error;
       if (i < maxRetries - 1) {
-        console.log(`[PR-Reorder] Retry ${i + 1}/${maxRetries} after ${delay}ms`);
+        console.log(
+          `[PR-Reorder] Retry ${i + 1}/${maxRetries} after ${delay}ms`
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
