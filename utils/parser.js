@@ -44,11 +44,7 @@ export function extractFiles(container) {
   }
 
   // Try multiple selectors for file elements
-  const fileSelectors = [
-    '.file',
-    '[data-file-type]',
-    '[data-path]',
-  ];
+  const fileSelectors = ['.file', '[data-file-type]', '[data-path]'];
 
   for (const selector of fileSelectors) {
     const files = filesContainer.querySelectorAll(selector);
