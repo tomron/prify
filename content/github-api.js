@@ -50,7 +50,7 @@ export function hasWritePermission() {
  */
 export function getPRId() {
   const match = window.location.pathname.match(
-    /^\/([^\/]+)\/([^\/]+)\/pull\/(\d+)/
+    /^\/([^/]+)\/([^/]+)\/pull\/(\d+)/
   );
 
   if (match) {
@@ -197,10 +197,10 @@ export async function postOrderComment(order, metadata = {}) {
 
 /**
  * Check if comment was successfully posted
- * @param {string} commentText - Expected comment text
+ * @param {string} _commentText - Expected comment text (unused, checks for prefix)
  * @returns {boolean} True if comment found
  */
-function checkCommentPosted(commentText) {
+function checkCommentPosted(_commentText) {
   const comments = document.querySelectorAll('.comment-body');
   for (const comment of comments) {
     if (comment.textContent.includes(COMMENT_PREFIX)) {
