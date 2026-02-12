@@ -10,6 +10,14 @@ import { saveOrder } from '../utils/storage.js';
 import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
 import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
+import {
+  saveToHistory,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+  clearHistory,
+} from '../utils/history.js';
 
 // Extension state
 let extensionLoaded = false;
@@ -42,6 +50,9 @@ async function init() {
   // Load and apply saved order
   await applySavedOrder();
 
+  // Set up keyboard shortcuts
+  setupKeyboardShortcuts();
+
   // Mark as loaded
   extensionLoaded = true;
   document.documentElement.setAttribute('data-pr-reorder', 'loaded');
@@ -72,6 +83,22 @@ function injectButtons() {
   container.className = 'pr-reorder-button-container';
   container.style.cssText = 'display: inline-flex; gap: 8px; margin-left: 8px;';
 
+  // Create Undo button
+  const undoBtn = document.createElement('button');
+  undoBtn.className = 'btn btn-sm pr-reorder-undo-btn';
+  undoBtn.textContent = '↶ Undo';
+  undoBtn.title = 'Undo last reorder (Ctrl+Z)';
+  undoBtn.disabled = true;
+  undoBtn.addEventListener('click', handleUndo);
+
+  // Create Redo button
+  const redoBtn = document.createElement('button');
+  redoBtn.className = 'btn btn-sm pr-reorder-redo-btn';
+  redoBtn.textContent = '↷ Redo';
+  redoBtn.title = 'Redo last undone reorder (Ctrl+Y)';
+  redoBtn.disabled = true;
+  redoBtn.addEventListener('click', handleRedo);
+
   // Create Reorder button
   const reorderBtn = document.createElement('button');
   reorderBtn.className = 'btn btn-sm';
@@ -88,6 +115,8 @@ function injectButtons() {
   // BUG-002: Track event listener
   manager.trackEventListener(viewBtn, 'click', handleViewOrdersClick);
 
+  container.appendChild(undoBtn);
+  container.appendChild(redoBtn);
   container.appendChild(reorderBtn);
   container.appendChild(viewBtn);
 
@@ -99,6 +128,9 @@ function injectButtons() {
 
   buttonsInjected = true;
   console.log('[PR-Reorder] Buttons injected');
+
+  // Update button states
+  updateUndoRedoButtons();
 }
 
 /**
@@ -121,6 +153,12 @@ function handleReorderClick() {
       const prId = getPRId();
       if (prId) {
         await saveOrder(prId, newOrder);
+
+        // Save to history for undo/redo
+        await saveToHistory(prId, newOrder);
+
+        // Update button states
+        await updateUndoRedoButtons();
 
         // Post to GitHub comments
         await saveOrderEverywhere(newOrder, {
@@ -211,6 +249,121 @@ async function applySavedOrder() {
 }
 
 /**
+ * Update undo/redo button states
+ */
+async function updateUndoRedoButtons() {
+  const prId = getPRId();
+  if (!prId) return;
+
+  try {
+    const undoAvailable = await canUndo(prId);
+    const redoAvailable = await canRedo(prId);
+
+    const undoBtn = document.querySelector('.pr-reorder-undo-btn');
+    const redoBtn = document.querySelector('.pr-reorder-redo-btn');
+
+    if (undoBtn) {
+      undoBtn.disabled = !undoAvailable;
+    }
+
+    if (redoBtn) {
+      redoBtn.disabled = !redoAvailable;
+    }
+  } catch (error) {
+    console.error('[PR-Reorder] Failed to update button states:', error);
+  }
+}
+
+/**
+ * Handle undo action
+ */
+async function handleUndo() {
+  const prId = getPRId();
+  if (!prId) return;
+
+  try {
+    const previousOrder = await undo(prId);
+    if (previousOrder) {
+      console.log('[PR-Reorder] Undoing to previous order');
+      reorderFiles(previousOrder);
+      await saveOrder(prId, previousOrder);
+      await updateUndoRedoButtons();
+    } else {
+      console.log('[PR-Reorder] Nothing to undo');
+    }
+  } catch (error) {
+    console.error('[PR-Reorder] Failed to undo:', error);
+  }
+}
+
+/**
+ * Handle redo action
+ */
+async function handleRedo() {
+  const prId = getPRId();
+  if (!prId) return;
+
+  try {
+    const nextOrder = await redo(prId);
+    if (nextOrder) {
+      console.log('[PR-Reorder] Redoing to next order');
+      reorderFiles(nextOrder);
+      await saveOrder(prId, nextOrder);
+      await updateUndoRedoButtons();
+    } else {
+      console.log('[PR-Reorder] Nothing to redo');
+    }
+  } catch (error) {
+    console.error('[PR-Reorder] Failed to redo:', error);
+  }
+}
+
+/**
+ * Set up keyboard shortcuts for undo/redo
+ */
+function setupKeyboardShortcuts() {
+  // Prevent duplicate listeners
+  document.removeEventListener('keydown', handleKeyboardShortcut);
+  document.addEventListener('keydown', handleKeyboardShortcut);
+}
+
+/**
+ * Handle keyboard shortcut events
+ */
+function handleKeyboardShortcut(event) {
+  // Check if we're on a PR page
+  if (!getPRId()) return;
+
+  // Check if user is typing in an input field
+  const target = event.target;
+  if (
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.isContentEditable
+  ) {
+    return;
+  }
+
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const modKey = isMac ? event.metaKey : event.ctrlKey;
+
+  // Ctrl+Z / Cmd+Z - Undo
+  if (modKey && event.key === 'z' && !event.shiftKey) {
+    event.preventDefault();
+    handleUndo();
+  }
+
+  // Ctrl+Y / Cmd+Shift+Z - Redo
+  if (
+    (modKey && event.key === 'y' && !isMac) ||
+    (modKey && event.key === 'z' && event.shiftKey && isMac)
+  ) {
+    event.preventDefault();
+    handleRedo();
+  }
+}
+
+/**
  * Wait for GitHub to finish loading the PR page
  */
 function waitForPageLoad() {
@@ -256,10 +409,22 @@ async function main() {
  */
 function observeNavigation() {
   const manager = getCleanupManager();
+  let lastPrId = getPRId();
 
   // Navigation handler
   const handleNavigation = async () => {
     console.log('[PR-Reorder] Navigation detected, reinitializing...');
+    const currentPrId = getPRId();
+
+    // Clear history if navigating to a different PR
+    if (currentPrId && currentPrId !== lastPrId) {
+      console.log('[PR-Reorder] New PR detected, clearing history');
+      await clearHistory(lastPrId);
+      lastPrId = currentPrId;
+    }
+
+    extensionLoaded = false;
+    buttonsInjected = false;
     await init();
   };
 
@@ -272,9 +437,21 @@ function observeNavigation() {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
       lastUrl = currentUrl;
+      const currentPrId = getPRId();
+
       console.log(
         '[PR-Reorder] URL changed, checking if reinitialization needed...'
       );
+
+      // Clear history if navigating to a different PR
+      if (currentPrId && currentPrId !== lastPrId) {
+        console.log('[PR-Reorder] New PR detected, clearing history');
+        clearHistory(lastPrId);
+        lastPrId = currentPrId;
+      }
+
+      extensionLoaded = false;
+      buttonsInjected = false;
       // BUG-002: Track timeout for cleanup
       manager.trackTimeout(init, 500);
     }

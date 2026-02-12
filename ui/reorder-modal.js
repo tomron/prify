@@ -45,10 +45,10 @@ export function createReorderModal(options = {}) {
   // Setup drag and drop
   setupDragAndDrop(fileList, {
     onDragStart: () => {
-      // Drag started
+      // Drag started - handled internally by setupDragAndDrop
     },
     onDragEnd: () => {
-      // Drag ended
+      // Drag ended - handled internally by setupDragAndDrop
     },
   });
 
