@@ -6,3 +6,265 @@
 [data-pr-reorder] {
   /* Extension loaded marker */
 }
+
+/* === Order Viewer Modal === */
+.pr-reorder-viewer-modal {
+  max-width: 800px;
+  max-height: 90vh;
+}
+
+.pr-reorder-viewer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pr-viewer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pr-viewer-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #d0d7de;
+}
+
+.pr-viewer-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #24292f;
+}
+
+.pr-viewer-subsection-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 8px 0 4px 0;
+  color: #57606a;
+}
+
+.pr-viewer-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.pr-viewer-stat {
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #f6f8fa;
+  color: #57606a;
+}
+
+.pr-viewer-stat-success {
+  background-color: #dafbe1;
+  color: #1a7f37;
+}
+
+.pr-viewer-stat-warning {
+  background-color: #fff8c5;
+  color: #7d4e00;
+}
+
+.pr-viewer-stat-danger {
+  background-color: #ffebe9;
+  color: #cf222e;
+}
+
+.pr-viewer-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pr-viewer-consensus-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+}
+
+.pr-viewer-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+}
+
+.pr-viewer-file-item-compact {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.pr-viewer-file-item-conflict {
+  border-color: #d4a72c;
+  background-color: #fffbdd;
+}
+
+.pr-viewer-file-position {
+  font-weight: 600;
+  color: #57606a;
+  min-width: 24px;
+  text-align: right;
+}
+
+.pr-viewer-file-path {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+  font-size: 13px;
+  color: #24292f;
+}
+
+.pr-viewer-empty {
+  text-align: center;
+  padding: 24px;
+  color: #57606a;
+  font-style: italic;
+}
+
+.pr-viewer-more {
+  justify-content: center;
+  color: #57606a;
+  font-size: 12px;
+  font-style: italic;
+  border-style: dashed;
+}
+
+/* Conflicts */
+.pr-viewer-conflicts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background-color: #fffbdd;
+  border-radius: 6px;
+}
+
+.pr-viewer-conflict-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background-color: #ffffff;
+  border: 1px solid #d4a72c;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.pr-viewer-conflict-file {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+  font-weight: 600;
+}
+
+.pr-viewer-conflict-positions {
+  color: #57606a;
+}
+
+.pr-viewer-conflict-stddev {
+  font-weight: 600;
+  color: #7d4e00;
+  font-family: monospace;
+}
+
+/* Order Cards */
+.pr-viewer-order-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.pr-viewer-order-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pr-viewer-order-user {
+  font-weight: 600;
+  color: #24292f;
+}
+
+.pr-viewer-order-timestamp {
+  font-size: 12px;
+  color: #57606a;
+}
+
+.pr-viewer-order-files {
+  background-color: #f6f8fa;
+  padding: 8px;
+  border-radius: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.pr-viewer-apply-btn {
+  align-self: flex-start;
+}
+
+/* Dark mode for viewer */
+@media (prefers-color-scheme: dark) {
+  .pr-viewer-section-title {
+    color: #c9d1d9;
+  }
+
+  .pr-viewer-subsection-title {
+    color: #8b949e;
+  }
+
+  .pr-viewer-stat {
+    background-color: #161b22;
+    color: #8b949e;
+  }
+
+  .pr-viewer-consensus-list,
+  .pr-viewer-order-files {
+    background-color: #161b22;
+  }
+
+  .pr-viewer-file-item {
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+
+  .pr-viewer-file-item-conflict {
+    background-color: #261d08;
+    border-color: #9e6a03;
+  }
+
+  .pr-viewer-file-path {
+    color: #c9d1d9;
+  }
+
+  .pr-viewer-order-card {
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+
+  .pr-viewer-order-user {
+    color: #c9d1d9;
+  }
+
+  .pr-viewer-conflicts-list {
+    background-color: #261d08;
+  }
+
+  .pr-viewer-conflict-item {
+    background-color: #0d1117;
+    border-color: #9e6a03;
+  }
+}
