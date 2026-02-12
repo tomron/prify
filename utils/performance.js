@@ -90,7 +90,7 @@ export function lazyLoad(items, renderFn, options = {}) {
           const placeholder = entry.target;
           const index = parseInt(placeholder.dataset.index, 10);
           const rendered = renderFn(items[index], index);
-          
+
           placeholder.replaceWith(rendered);
           observer.unobserve(placeholder);
         }
