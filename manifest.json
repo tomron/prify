@@ -3,24 +3,13 @@
   "name": "PR File Reorder",
   "version": "0.1.0",
   "description": "Collaborative file ordering in GitHub Pull Requests to improve code review efficiency",
-  "permissions": [
-    "storage"
-  ],
-  "host_permissions": [
-    "https://github.com/*"
-  ],
+  "permissions": ["storage"],
+  "host_permissions": ["https://github.com/*"],
   "content_scripts": [
     {
-      "matches": [
-        "https://github.com/*/pull/*",
-        "https://github.com/*/pulls"
-      ],
-      "js": [
-        "content/content.js"
-      ],
-      "css": [
-        "ui/styles.css"
-      ],
+      "matches": ["https://github.com/*/pull/*", "https://github.com/*/pulls"],
+      "js": ["content/content.js"],
+      "css": ["ui/styles.css"],
       "run_at": "document_idle"
     }
   ],
