@@ -86,10 +86,7 @@ export function createOrderComment(order, metadata = {}) {
  * @returns {Object|null} Parsed order data or null
  */
 export function parseOrderComment(commentHTML) {
-  const regex = new RegExp(
-    `<!-- ${COMMENT_PREFIX}\\n([\\s\\S]*?)\\n-->`,
-    'g'
-  );
+  const regex = new RegExp(`<!-- ${COMMENT_PREFIX}\\n([\\s\\S]*?)\\n-->`, 'g');
 
   const match = regex.exec(commentHTML);
   if (!match) {
