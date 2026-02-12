@@ -215,7 +215,10 @@ describe('DOM Manipulator - Simple Tests', () => {
         addMockFile(container, `file${i}.js`);
       }
 
-      const order = Array.from({ length: fileCount }, (_, i) => `file${i}.js`).reverse();
+      const order = Array.from(
+        { length: fileCount },
+        (_, i) => `file${i}.js`
+      ).reverse();
 
       const start = Date.now();
       reorderFiles(order);

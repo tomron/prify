@@ -3,7 +3,11 @@
  * Handles reordering of file elements in GitHub PR pages
  */
 
-import { extractFiles, getFilePath, getFilesContainer } from '../utils/parser.js';
+import {
+  extractFiles,
+  getFilePath,
+  getFilesContainer,
+} from '../utils/parser.js';
 
 // MutationObserver instance
 let observer = null;
@@ -32,9 +36,7 @@ function validateOrderInput(order) {
 export function getCurrentOrder(container) {
   const files = extractFiles(container);
 
-  return files
-    .map((file) => getFilePath(file))
-    .filter((path) => path !== null);
+  return files.map((file) => getFilePath(file)).filter((path) => path !== null);
 }
 
 /**
@@ -52,7 +54,9 @@ export function validateFileOrder(order, container) {
 
   // Check for duplicates in order
   if (orderSet.size !== order.length) {
-    const duplicates = order.filter((item, index) => order.indexOf(item) !== index);
+    const duplicates = order.filter(
+      (item, index) => order.indexOf(item) !== index
+    );
     const uniqueDupes = [...new Set(duplicates)];
     errors.push(`Duplicate files: ${uniqueDupes.join(', ')}`);
   }
