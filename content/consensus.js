@@ -3,7 +3,10 @@
  * Calculate democratic consensus from multiple user file orders
  */
 
-import { sortByAveragePosition, calculateAveragePosition } from '../utils/array-utils.js';
+import {
+  sortByAveragePosition,
+  calculateAveragePosition,
+} from '../utils/array-utils.js';
 
 /**
  * Calculate consensus order from multiple user orders
@@ -148,7 +151,10 @@ export function getConsensusMetadata(orders, consensus) {
   );
 
   // Find conflicts (files with high position variance)
-  const conflicts = findConflicts(orders.map((o) => o.order), consensus);
+  const conflicts = findConflicts(
+    orders.map((o) => o.order),
+    consensus
+  );
 
   // Get most recent timestamp
   const timestamps = orders
@@ -157,7 +163,8 @@ export function getConsensusMetadata(orders, consensus) {
     .map((t) => new Date(t))
     .sort((a, b) => b - a);
 
-  const mostRecentTimestamp = timestamps.length > 0 ? timestamps[0].toISOString() : null;
+  const mostRecentTimestamp =
+    timestamps.length > 0 ? timestamps[0].toISOString() : null;
 
   return {
     participantCount: orders.length,
@@ -184,7 +191,8 @@ function calculateAgreementScore(orderArrays, consensus) {
     calculateOrderDistance(order, consensus)
   );
 
-  const avgDistance = distances.reduce((sum, d) => sum + d, 0) / distances.length;
+  const avgDistance =
+    distances.reduce((sum, d) => sum + d, 0) / distances.length;
 
   // Normalize to 0-1 (lower distance = higher agreement)
   // Max possible distance is array length
@@ -287,10 +295,12 @@ export function mergeOrder(consensus, newOrder, weight = 1) {
   });
 
   // Calculate average positions and sort
-  const items = Array.from(positions.entries()).map(([file, { sum, count }]) => ({
-    file,
-    avgPosition: sum / count,
-  }));
+  const items = Array.from(positions.entries()).map(
+    ([file, { sum, count }]) => ({
+      file,
+      avgPosition: sum / count,
+    })
+  );
 
   items.sort((a, b) => a.avgPosition - b.avgPosition);
 
