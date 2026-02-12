@@ -3,11 +3,10 @@
  * Orchestrates all components to enable collaborative file ordering
  */
 
-import { extractAllFilesMetadata as _extractAllFilesMetadata } from '../utils/parser.js';
 import { getCurrentOrder, reorderFiles } from './dom-manipulator.js';
 import { createReorderModal } from '../ui/reorder-modal.js';
 import { createOrderViewerModal } from '../ui/order-viewer.js';
-import { saveOrder, loadOrder as _loadOrder } from '../utils/storage.js';
+import { saveOrder } from '../utils/storage.js';
 import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
 
