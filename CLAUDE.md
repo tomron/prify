@@ -37,31 +37,46 @@ The user (Tom) is head of AI transportation and DevEx, has a Rugby Sevens backgr
 
 ### During Development
 
-1. **Lint on every change**: `npm run lint` - Fix all errors before committing
-2. **Test frequently**: `npm test` or `npm run test:watch`
-3. **Use relevant tools**:
+1. **Lint on EVERY change**:
+   - Run `npm run lint` after ANY code modification
+   - Fix ALL errors AND warnings immediately
+   - Zero tolerance for lint failures
+   - NEVER commit code with lint errors
+2. **Format code**: Run `npm run format` to auto-fix formatting issues
+3. **Test frequently**: `npm test` or `npm run test:watch`
+4. **Use relevant tools**:
    - ESLint for code quality (must pass on every commit)
+   - Prettier for formatting (must pass on every commit)
    - Playwright for E2E tests
    - Chrome DevTools for debugging
    - Jest for unit tests
-4. **Keep commits atomic** - one logical change per commit
-5. **Write descriptive commit messages**
+5. **Keep commits atomic** - one logical change per commit
+6. **Write descriptive commit messages**
 
-**IMPORTANT**: Always run `npm run lint` before committing. All lint errors must be fixed. Zero tolerance for lint failures.
+**CRITICAL WORKFLOW - Run BEFORE every commit**:
+```bash
+npm run lint          # Must pass with ZERO errors/warnings
+npm run format:check  # Must pass (or run npm run format to fix)
+npm test             # Must pass all tests
+```
+
+**IMPORTANT**: Always run the critical workflow above before committing. All lint errors AND warnings must be fixed. Zero tolerance for lint/format failures.
 
 ### Before Creating PR
 
-1. **CRITICAL: No lint errors**: `npm run lint` - Must pass with zero errors
-2. **All tests pass**: `npm test`
-3. **Build succeeds**: `npm run build`
-4. **Manual testing done**: Load extension, test on real GitHub PR
-5. **Documentation updated**: Code comments, README if needed
+1. **CRITICAL: No lint errors/warnings**: `npm run lint` - Must pass with zero errors AND warnings
+2. **CRITICAL: Code is formatted**: `npm run format:check` - Must pass (run `npm run format` if needed)
+3. **All tests pass**: `npm test`
+4. **Build succeeds**: `npm run build`
+5. **Manual testing done**: Load extension, test on real GitHub PR
+6. **Documentation updated**: Code comments, README if needed
 
-**Pre-commit Checklist**:
+**Pre-commit Checklist** (MUST pass ALL of these):
 ```bash
-npm run lint    # Must exit with code 0
-npm test        # Must show all tests passing
-npm run build   # Must complete without errors
+npm run lint           # Must exit with code 0 - ZERO errors, ZERO warnings
+npm run format:check   # Must pass - run npm run format to auto-fix
+npm test              # Must show all tests passing
+npm run build         # Must complete without errors
 ```
 
 If any of these fail, **DO NOT COMMIT**. Fix all issues first.
