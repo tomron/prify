@@ -1,21 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Simple GitHub PR Mock</title>
-</head>
-<body>
-  <div class="files">
-    <div class="file" data-path="a.js" data-additions="10" data-deletions="5">
-      <div class="file-info"><a>a.js</a></div>
+  <head>
+    <title>Simple GitHub PR Mock</title>
+  </head>
+  <body>
+    <div class="files">
+      <div class="file" data-path="a.js" data-additions="10" data-deletions="5">
+        <div class="file-info"><a>a.js</a></div>
+      </div>
+      <div
+        class="file"
+        data-path="b.js"
+        data-additions="20"
+        data-deletions="10"
+      >
+        <div class="file-info"><a>b.js</a></div>
+      </div>
+      <div class="file" data-path="c.js" data-additions="15" data-deletions="3">
+        <div class="file-info"><a>c.js</a></div>
+      </div>
     </div>
-    <div class="file" data-path="b.js" data-additions="20" data-deletions="10">
-      <div class="file-info"><a>b.js</a></div>
-    </div>
-    <div class="file" data-path="c.js" data-additions="15" data-deletions="3">
-      <div class="file-info"><a>c.js</a></div>
-    </div>
-  </div>
-  <textarea id="new_comment_field"></textarea>
-  <button class="js-comment-button">Comment</button>
-</body>
+    <textarea id="new_comment_field"></textarea>
+    <button class="js-comment-button">Comment</button>
+  </body>
 </html>
