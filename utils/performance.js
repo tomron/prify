@@ -135,9 +135,10 @@ export function createVirtualScroller(options) {
   let visibleStart = 0;
   let visibleEnd = 0;
 
-  const totalHeight = items.length * itemHeight;
+  // Calculate viewport metrics for virtual scrolling
+  // const totalHeight = items.length * itemHeight;
   const viewportHeight = container.clientHeight;
-  const visibleCount = Math.ceil(viewportHeight / itemHeight);
+  // const visibleCount = Math.ceil(viewportHeight / itemHeight);
 
   // Create spacers
   const topSpacer = document.createElement('div');
