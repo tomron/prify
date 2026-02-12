@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock GitHub PR - Testing PR File Reorder</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #0d1117;
+      color: #c9d1d9;
+    }
+    .files {
+      margin-top: 20px;
+    }
+    .file {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      padding: 16px;
+    }
+    .file-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .file-info a {
+      color: #58a6ff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .diffstat {
+      color: #8b949e;
+      font-size: 12px;
+    }
+    .diffstat-additions {
+      color: #3fb950;
+    }
+    .diffstat-deletions {
+      color: #f85149;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pull Request #123: Add new feature</h1>
+    <div class="files-changed-header">
+      <h2>Files changed (5)</h2>
+    </div>
+
+    <div class="files" data-pr-reorder-container>
+      <div class="file" data-path="README.md" data-additions="10" data-deletions="2">
+        <div class="file-header">
+          <div class="file-info">
+            <a href="#diff-readme">README.md</a>
+          </div>
+          <div class="diffstat">
+            <span class="diffstat-additions">+10</span>
+            <span class="diffstat-deletions">-2</span>
+          </div>
+        </div>
+        <div class="file-content">
+          <!-- Mock diff content -->
+        </div>
+      </div>
+
+      <div class="file" data-path="package.json" data-additions="5" data-deletions="1">
+        <div class="file-header">
+          <div class="file-info">
+            <a href="#diff-package">package.json</a>
+          </div>
+          <div class="diffstat">
+            <span class="diffstat-additions">+5</span>
+            <span class="diffstat-deletions">-1</span>
+          </div>
+        </div>
+        <div class="file-content">
+          <!-- Mock diff content -->
+        </div>
+      </div>
+
+      <div class="file" data-path="src/engine.ts" data-additions="150" data-deletions="50">
+        <div class="file-header">
+          <div class="file-info">
+            <a href="#diff-engine">src/engine.ts</a>
+          </div>
+          <div class="diffstat">
+            <span class="diffstat-additions">+150</span>
+            <span class="diffstat-deletions">-50</span>
+          </div>
+        </div>
+        <div class="file-content">
+          <!-- Mock diff content -->
+        </div>
+      </div>
+
+      <div class="file" data-path="src/utils.ts" data-additions="20" data-deletions="5">
+        <div class="file-header">
+          <div class="file-info">
+            <a href="#diff-utils">src/utils.ts</a>
+          </div>
+          <div class="diffstat">
+            <span class="diffstat-additions">+20</span>
+            <span class="diffstat-deletions">-5</span>
+          </div>
+        </div>
+        <div class="file-content">
+          <!-- Mock diff content -->
+        </div>
+      </div>
+
+      <div class="file" data-path="tests/engine.test.ts" data-additions="80" data-deletions="10">
+        <div class="file-header">
+          <div class="file-info">
+            <a href="#diff-test">tests/engine.test.ts</a>
+          </div>
+          <div class="diffstat">
+            <span class="diffstat-additions">+80</span>
+            <span class="diffstat-deletions">-10</span>
+          </div>
+        </div>
+        <div class="file-content">
+          <!-- Mock diff content -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock comment section for order storage -->
+    <div class="timeline-comment-wrapper">
+      <div class="comment">
+        <div class="comment-body">
+          <!-- Extension will post orders here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock comment form -->
+    <div class="timeline-new-comment">
+      <textarea id="new_comment_field" placeholder="Leave a comment"></textarea>
+      <button class="js-comment-button">Comment</button>
+    </div>
+  </div>
+</body>
+</html>
