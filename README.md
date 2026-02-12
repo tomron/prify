@@ -202,7 +202,3 @@ Orders are stored as hidden HTML comments in PRs:
 ## License
 
 MIT
-
-## Author
-
-Tom Ron - Head of AI Transportation and DevEx
