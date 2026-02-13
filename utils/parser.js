@@ -188,14 +188,17 @@ export function extractFiles(container) {
       if (selector.includes('diff-')) {
         // For diff- selectors, filter to only file diffs (have actual file content)
         files = files.filter((el) => {
-          // Must have an ID that looks like: diff-{hash}-{hash}--{path}
-          // NOT like: diff-comparison-viewer-container
-          return (
+          // File IDs are like: diff-{64-char-hex-hash}
+          // Exclude: diff-comparison-viewer-container, diff-file-tree-filter, diff-placeholder
+          const isLongHash = el.id && el.id.match(/^diff-[a-f0-9]{64}$/);
+          const isContainer =
             el.id &&
-            el.id.match(/^diff-[a-f0-9]+-[a-f0-9]+--/) &&
-            !el.id.includes('container') &&
-            !el.id.includes('viewer')
-          );
+            (el.id.includes('container') ||
+              el.id.includes('viewer') ||
+              el.id.includes('filter') ||
+              el.id.includes('placeholder'));
+
+          return isLongHash && !isContainer;
         });
       }
 
@@ -249,6 +252,20 @@ export function getFilePath(fileElement) {
     // Try data-file-path (new GitHub)
     if (fileElement.dataset && fileElement.dataset.filePath) {
       return fileElement.dataset.filePath;
+    }
+
+    // Try to extract from heading (new GitHub - most common)
+    const heading = fileElement.querySelector('h2, h3, [role="heading"]');
+    if (heading && heading.textContent) {
+      // Remove directional marks and trim
+      const path = heading.textContent
+        .replace(/[\u200E\u200F]/g, '') // Remove LTR/RTL marks
+        .trim();
+      if (path && !path.includes('\n')) {
+        // Valid single-line path
+        parserStats.fallbacksUsed++;
+        return path;
+      }
     }
 
     // Try to extract from ID (diff-{hash}--{path})
