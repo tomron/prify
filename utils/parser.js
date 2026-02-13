@@ -116,6 +116,10 @@ export function getFilesContainer(container) {
       '.files',
       '[data-target="diff-container"]',
       '.js-diff-progressive-container',
+      '[data-hpc]', // New GitHub (Primer React Components)
+      'turbo-frame[id*="repo-content"]', // Turbo frame
+      '#diff-comparison-viewer-container', // New GitHub diff viewer
+      'body', // Last resort - search entire page
     ];
 
     for (let i = 0; i < selectors.length; i++) {
