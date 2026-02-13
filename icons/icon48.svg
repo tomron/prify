@@ -1,4 +1,35 @@
-<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
-  <rect width="48" height="48" fill="#4CAF50"/>
-  <text x="24" y="34" font-family="Arial" font-size="32" fill="white" text-anchor="middle" font-weight="bold">P</text>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2da44e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a7f37;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded rectangle background -->
+  <rect width="128" height="128" rx="24" fill="url(#bgGradient)"/>
+
+  <!-- Three stacked files representing a PR -->
+  <g transform="translate(28, 24)">
+    <!-- File 1 (top) - being moved -->
+    <rect x="0" y="0" width="72" height="16" rx="3" fill="#ffffff" opacity="0.95" filter="url(#shadow)"/>
+    <rect x="4" y="4" width="32" height="8" rx="1.5" fill="#1a7f37" opacity="0.5"/>
+
+    <!-- Arrow indicating movement -->
+    <g transform="translate(58, 24)">
+      <path d="M 7 0 L 0 7 L 3 7 L 3 17 L 11 17 L 11 7 L 14 7 Z" fill="#ffffff" opacity="0.9"/>
+    </g>
+
+    <!-- File 2 (middle) -->
+    <rect x="0" y="48" width="72" height="16" rx="3" fill="#ffffff" opacity="0.9"/>
+    <rect x="4" y="52" width="48" height="8" rx="1.5" fill="#1a7f37" opacity="0.4"/>
+
+    <!-- File 3 (bottom) -->
+    <rect x="0" y="72" width="72" height="16" rx="3" fill="#ffffff" opacity="0.9"/>
+    <rect x="4" y="76" width="24" height="8" rx="1.5" fill="#1a7f37" opacity="0.4"/>
+  </g>
 </svg>

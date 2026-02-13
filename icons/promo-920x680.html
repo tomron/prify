@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      width: 920px;
+      height: 680px;
+      background: linear-gradient(135deg, #2da44e 0%, #1a7f37 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+    .content {
+      text-align: center;
+      z-index: 10;
+    }
+    .icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+    }
+    h1 {
+      margin: 0 0 16px 0;
+      font-size: 56px;
+      font-weight: 700;
+    }
+    .tagline {
+      margin: 0 0 32px 0;
+      font-size: 24px;
+      opacity: 0.95;
+    }
+    .features {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      margin-top: 48px;
+    }
+    .feature {
+      text-align: center;
+      max-width: 200px;
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .feature-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .bg-decoration {
+      position: absolute;
+      opacity: 0.1;
+    }
+    .file-stack {
+      position: absolute;
+      top: 80px;
+      left: 60px;
+    }
+    .file-item {
+      width: 120px;
+      height: 20px;
+      background: white;
+      margin: 8px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="file-stack bg-decoration">
+    <div class="file-item" style="width: 140px;"></div>
+    <div class="file-item" style="width: 100px;"></div>
+    <div class="file-item" style="width: 160px;"></div>
+    <div class="file-item" style="width: 80px;"></div>
+  </div>
+
+  <div class="content">
+    <div class="icon">
+      <svg width="120" height="120" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+        <rect width="128" height="128" rx="24" fill="rgba(255,255,255,0.25)"/>
+        <g transform="translate(28, 24)">
+          <rect x="0" y="0" width="72" height="16" rx="3" fill="#ffffff"/>
+          <rect x="4" y="4" width="32" height="8" rx="1.5" fill="#1a7f37"/>
+          <g transform="translate(58, 24)">
+            <path d="M 7 0 L 0 7 L 3 7 L 3 17 L 11 17 L 11 7 L 14 7 Z" fill="#ffffff"/>
+          </g>
+          <rect x="0" y="48" width="72" height="16" rx="3" fill="#ffffff" opacity="0.95"/>
+          <rect x="4" y="52" width="48" height="8" rx="1.5" fill="#1a7f37"/>
+          <rect x="0" y="72" width="72" height="16" rx="3" fill="#ffffff" opacity="0.95"/>
+          <rect x="4" y="76" width="24" height="8" rx="1.5" fill="#1a7f37"/>
+        </g>
+      </svg>
+    </div>
+    <h1>PR File Reorder</h1>
+    <p class="tagline">Collaborative file ordering for better code reviews</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-title">Democratic</div>
+        <div class="feature-desc">All reviewers collaborate on file order</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Fast</div>
+        <div class="feature-desc">Drag and drop to reorder instantly</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Zero Backend</div>
+        <div class="feature-desc">Uses GitHub comments for storage</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      width: 440px;
+      height: 280px;
+      background: linear-gradient(135deg, #2da44e 0%, #1a7f37 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+    }
+    p {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.95;
+      text-align: center;
+      padding: 0 20px;
+    }
+    .files {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      opacity: 0.3;
+    }
+    .file-icon {
+      width: 40px;
+      height: 8px;
+      background: white;
+      margin: 4px 0;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon">
+    <svg width="80" height="80" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+      <rect width="128" height="128" rx="24" fill="rgba(255,255,255,0.2)"/>
+      <g transform="translate(28, 24)">
+        <rect x="0" y="0" width="72" height="16" rx="3" fill="#ffffff"/>
+        <rect x="4" y="4" width="32" height="8" rx="1.5" fill="#1a7f37"/>
+        <g transform="translate(58, 24)">
+          <path d="M 7 0 L 0 7 L 3 7 L 3 17 L 11 17 L 11 7 L 14 7 Z" fill="#ffffff"/>
+        </g>
+        <rect x="0" y="48" width="72" height="16" rx="3" fill="#ffffff" opacity="0.9"/>
+        <rect x="4" y="52" width="48" height="8" rx="1.5" fill="#1a7f37"/>
+        <rect x="0" y="72" width="72" height="16" rx="3" fill="#ffffff" opacity="0.9"/>
+        <rect x="4" y="76" width="24" height="8" rx="1.5" fill="#1a7f37"/>
+      </g>
+    </svg>
+  </div>
+  <h1>PR File Reorder</h1>
+  <p>Collaborative file ordering for GitHub Pull Requests</p>
+  <div class="files">
+    <div class="file-icon" style="width: 50px;"></div>
+    <div class="file-icon" style="width: 35px;"></div>
+    <div class="file-icon" style="width: 60px;"></div>
+  </div>
+</body>
+</html>
