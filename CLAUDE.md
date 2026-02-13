@@ -15,6 +15,7 @@
 4. **Zero infrastructure** - No backend servers, APIs, or databases
 5. **Test-driven** - Write tests first, code second
 6. **Git discipline** - Every feature/bug gets its own worktree and branch
+7. **Branch protection** - NEVER push directly to main, always use PRs
 
 ## Project Context
 
@@ -24,13 +25,26 @@ The user (Tom) is head of AI transportation and DevEx, has a Rugby Sevens backgr
 
 ## Development Workflow
 
+### Git Workflow Rules
+
+**CRITICAL: NEVER PUSH DIRECTLY TO MAIN**
+
+- All changes MUST go through a Pull Request
+- Always work on a feature branch
+- Main branch is protected - direct pushes are forbidden
+- Use feature branches with descriptive names: `feature/<task-id>-<description>` or `docs/<description>`
+
 ### Before Starting Any Task
 
 1. **Read the task details** in `tasks.md`
-2. **Create git worktree**:
+2. **Create git worktree** OR **Create feature branch**:
    ```bash
+   # Option 1: Using worktrees (recommended for larger tasks)
    git worktree add ../pr-file-reorder-<task-id> -b feature/<task-id>-<description>
    cd ../pr-file-reorder-<task-id>
+
+   # Option 2: Using branches (for smaller tasks)
+   git checkout -b feature/<task-id>-<description>
    ```
 3. **Review Definition of Done** - know what success looks like
 4. **Write tests first** - TDD approach
@@ -83,6 +97,28 @@ npm run build         # Must complete without errors
 ```
 
 If any of these fail, **DO NOT COMMIT**. Fix all issues first.
+
+### Before Pushing to Remote
+
+**CRITICAL PRE-PUSH CHECKLIST** (MUST pass ALL of these):
+```bash
+npm run build         # Build must succeed
+npm run lint          # Zero errors, zero warnings
+npm run format:check  # Code must be formatted
+npm test             # All tests must pass
+```
+
+**NEVER push to main directly** - Always push to a feature branch and create a Pull Request.
+
+```bash
+# ✅ Correct: Push to feature branch
+git push -u origin feature/<task-id>-<description>
+
+# ❌ FORBIDDEN: Never push to main
+git push origin main  # This should NEVER happen
+```
+
+After pushing, create a Pull Request for code review.
 
 ### After PR Merged
 
@@ -681,6 +717,8 @@ npm run test:e2e          # E2E tests only
 npm run build && npm run lint && npm test  # Run all checks
 
 # Git workflow
+git checkout -b feature/<name>  # Create feature branch (NEVER work on main)
+git push -u origin feature/<name>  # Push feature branch (NEVER push to main)
 git worktree list         # List all worktrees
 git worktree prune       # Clean up deleted worktrees
 git branch -d <branch>   # Delete merged branch
