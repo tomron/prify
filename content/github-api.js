@@ -65,11 +65,14 @@ export function getPRId() {
 
 /**
  * Check if we're on the Files Changed tab
- * @returns {boolean} True if on /files page or files tab is active
+ * @returns {boolean} True if on /files or /changes page or files tab is active
  */
 export function isOnFilesTab() {
-  // Check URL path - most reliable method
-  if (window.location.pathname.includes('/files')) {
+  // Check URL path - GitHub uses both /files and /changes
+  if (
+    window.location.pathname.includes('/files') ||
+    window.location.pathname.includes('/changes')
+  ) {
     return true;
   }
 
