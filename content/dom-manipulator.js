@@ -124,7 +124,11 @@ export function reorderFiles(order, container) {
       // If file is not a direct child, find the wrapper that is
       if (fileElement.parentNode !== filesContainer) {
         let parent = fileElement.parentNode;
-        while (parent && parent.parentNode !== filesContainer && parent !== filesContainer) {
+        while (
+          parent &&
+          parent.parentNode !== filesContainer &&
+          parent !== filesContainer
+        ) {
           parent = parent.parentNode;
         }
         if (parent && parent !== filesContainer) {
@@ -150,7 +154,11 @@ export function reorderFiles(order, container) {
       // If file is not a direct child, find the wrapper that is
       if (fileElement.parentNode !== filesContainer) {
         let parent = fileElement.parentNode;
-        while (parent && parent.parentNode !== filesContainer && parent !== filesContainer) {
+        while (
+          parent &&
+          parent.parentNode !== filesContainer &&
+          parent !== filesContainer
+        ) {
           parent = parent.parentNode;
         }
         if (parent && parent !== filesContainer) {

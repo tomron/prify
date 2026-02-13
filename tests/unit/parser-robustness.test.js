@@ -4,7 +4,6 @@
 
 import {
   getFilesContainer,
-  
   getFilePath,
   detectDOMStructureVersion,
   getParserStats,

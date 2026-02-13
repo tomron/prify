@@ -92,7 +92,9 @@ function injectButtons() {
     const count = document.querySelectorAll(selector).length;
     if (count > 0) {
       filesExist = true;
-      console.log(`[PR-Reorder] Found ${count} files using selector: ${selector}`);
+      console.log(
+        `[PR-Reorder] Found ${count} files using selector: ${selector}`
+      );
       break;
     }
   }
@@ -127,9 +129,7 @@ function injectButtons() {
       fileHeader = element;
       if (i > 0) {
         usedFallback = true;
-        console.log(
-          `[PR-Reorder] Used fallback selector: ${selectors[i]}`
-        );
+        console.log(`[PR-Reorder] Used fallback selector: ${selectors[i]}`);
       }
       break;
     }

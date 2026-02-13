@@ -7,10 +7,7 @@
   "host_permissions": ["https://github.com/*"],
   "content_scripts": [
     {
-      "matches": [
-        "https://github.com/*/pull/*",
-        "https://github.com/*/pulls"
-      ],
+      "matches": ["https://github.com/*/pull/*", "https://github.com/*/pulls"],
       "js": ["dist/content.js"],
       "css": ["ui/styles.css"],
       "run_at": "document_idle"
