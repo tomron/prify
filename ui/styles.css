@@ -322,6 +322,24 @@
   animation: spin 0.6s linear infinite;
 }
 
+.pr-reorder-spinner-small {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}
+
+.pr-reorder-spinner-medium {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.pr-reorder-spinner-large {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -331,6 +349,101 @@
 .pr-reorder-spinner-dark {
   border-color: rgba(27, 31, 36, 0.3);
   border-top-color: #24292f;
+}
+
+/* === Loading Overlay === */
+.pr-reorder-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.pr-reorder-loading-message {
+  color: #24292f;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* === Skeleton Screens === */
+.pr-reorder-skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.pr-reorder-skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e1e4e8;
+  flex-shrink: 0;
+}
+
+.pr-reorder-skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pr-reorder-skeleton-row {
+  height: 12px;
+  background-color: #e1e4e8;
+  border-radius: 3px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* === Success Animations === */
+.pr-reorder-success-checkmark {
+  animation: checkmark 0.5s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pr-reorder-success-pulse {
+  animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(42, 164, 78, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(42, 164, 78, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(42, 164, 78, 0);
+  }
 }
 
 /* === Empty State === */
@@ -356,6 +469,36 @@
 .pr-reorder-empty-description {
   font-size: 14px;
   color: #6e7781;
+}
+
+/* Empty State with Action Button */
+.pr-reorder-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.pr-reorder-empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.pr-reorder-empty-state-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #24292f;
+}
+
+.pr-reorder-empty-state-message {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #586069;
+  max-width: 400px;
 }
 
 /* === Utilities === */
