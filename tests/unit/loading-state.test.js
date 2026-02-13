@@ -184,9 +184,9 @@ describe('Loading State Utilities', () => {
       showSuccessAnimation(element, 'checkmark');
 
       setTimeout(() => {
-        expect(
-          element.classList.contains('pr-reorder-success-checkmark')
-        ).toBe(false);
+        expect(element.classList.contains('pr-reorder-success-checkmark')).toBe(
+          false
+        );
         done();
       }, 1100);
     });
@@ -316,7 +316,9 @@ describe('Loading State Utilities', () => {
 
       // Overlay should be present during execution
       await new Promise((resolve) => setTimeout(resolve, 5));
-      expect(container.querySelector('.pr-reorder-loading-overlay')).not.toBeNull();
+      expect(
+        container.querySelector('.pr-reorder-loading-overlay')
+      ).not.toBeNull();
 
       await promise;
 

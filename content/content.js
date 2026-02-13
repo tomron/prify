@@ -13,7 +13,12 @@ import {
 import { createReorderModal } from '../ui/reorder-modal.js';
 import { createOrderViewerModal } from '../ui/order-viewer.js';
 import { saveOrder } from '../utils/storage.js';
-import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
+import {
+  getPRId,
+  loadAllOrders,
+  saveOrderEverywhere,
+  isOnFilesTab,
+} from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
 import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
 
@@ -44,6 +49,14 @@ async function init() {
     return;
   }
 
+  // Check if we're on the Files tab
+  if (!isOnFilesTab()) {
+    console.log(
+      '[PR-Reorder] Not on Files tab yet. Extension will activate when you navigate to Files.'
+    );
+    return;
+  }
+
   console.log('[PR-Reorder] Initializing on PR:', prId);
 
   // Inject buttons
@@ -65,10 +78,79 @@ async function init() {
 function injectButtons() {
   if (buttonsInjected) return;
 
+  // First, check if files have actually loaded
+  // Try multiple selectors as GitHub changes attributes frequently
+  const fileSelectors = [
+    '[data-path]', // Old GitHub
+    '[data-file-path]', // New GitHub
+    '[id^="diff-"]', // Diff containers
+  ];
+
+  let filesExist = false;
+
+  for (const selector of fileSelectors) {
+    const count = document.querySelectorAll(selector).length;
+    if (count > 0) {
+      filesExist = true;
+      console.log(
+        `[PR-Reorder] Found ${count} files using selector: ${selector}`
+      );
+      break;
+    }
+  }
+
+  if (!filesExist) {
+    console.log('[PR-Reorder] Files not loaded yet, waiting...');
+    const manager = getCleanupManager();
+    manager.trackTimeout(injectButtons, 500);
+    return;
+  }
+
+  console.log('[PR-Reorder] Files detected, finding injection point...');
+
   // Find the file header (where "Files changed" is)
-  const fileHeader = document.querySelector('.pr-review-tools');
+  // Try multiple selectors for GitHub's evolving DOM structure
+  const selectors = [
+    '.pr-review-tools', // Old GitHub
+    '#files_bucket .file-header[data-file-type]', // New GitHub (near first file)
+    '#files .diffbar', // Alternative location
+    '.diff-view .file-actions', // Another alternative
+    '#files', // Fallback - just find the files container
+    '[data-hpc]', // New GitHub structure (Primer React Components)
+    'turbo-frame[id*="repo-content"]', // Turbo frame container
+  ];
+
+  let fileHeader = null;
+  let usedFallback = false;
+
+  for (let i = 0; i < selectors.length; i++) {
+    const element = document.querySelector(selectors[i]);
+    if (element) {
+      fileHeader = element;
+      if (i > 0) {
+        usedFallback = true;
+        console.log(`[PR-Reorder] Used fallback selector: ${selectors[i]}`);
+      }
+      break;
+    }
+  }
+
   if (!fileHeader) {
-    console.warn('[PR-Reorder] Could not find file header, retrying...');
+    console.warn(
+      '[PR-Reorder] Could not find file header with any selector. Tried:',
+      selectors
+    );
+    console.warn(
+      '[PR-Reorder] Available elements:',
+      'files:',
+      !!document.querySelector('#files'),
+      'files_bucket:',
+      !!document.querySelector('#files_bucket'),
+      'data-hpc:',
+      !!document.querySelector('[data-hpc]'),
+      'files with [data-path]:',
+      document.querySelectorAll('[data-path]').length
+    );
     // BUG-002: Track timeout for cleanup
     const manager = getCleanupManager();
     manager.trackTimeout(injectButtons, 1000);
@@ -101,8 +183,23 @@ function injectButtons() {
   container.appendChild(reorderBtn);
   container.appendChild(viewBtn);
 
-  // Inject into UI
-  fileHeader.appendChild(container);
+  // Inject into UI - use different strategies based on where we found the header
+  if (
+    usedFallback &&
+    (fileHeader.id === 'files' ||
+      fileHeader.hasAttribute('data-hpc') ||
+      fileHeader.tagName === 'TURBO-FRAME')
+  ) {
+    // If injecting into container (not a proper header), prepend with better styling
+    container.style.cssText =
+      'display: flex; gap: 8px; padding: 16px; border-bottom: 1px solid #d0d7de; background: #f6f8fa; position: sticky; top: 0; z-index: 100;';
+    fileHeader.insertBefore(container, fileHeader.firstChild);
+    console.log('[PR-Reorder] Injected into container (prepended)');
+  } else {
+    // Normal injection for proper header locations
+    fileHeader.appendChild(container);
+    console.log('[PR-Reorder] Injected into header (appended)');
+  }
 
   // BUG-002: Track injected element
   manager.trackElement(container);

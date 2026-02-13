@@ -64,6 +64,34 @@ export function getPRId() {
 }
 
 /**
+ * Check if we're on the Files Changed tab
+ * @returns {boolean} True if on /files or /changes page or files tab is active
+ */
+export function isOnFilesTab() {
+  // Check URL path - GitHub uses both /files and /changes
+  if (
+    window.location.pathname.includes('/files') ||
+    window.location.pathname.includes('/changes')
+  ) {
+    return true;
+  }
+
+  // Check if files tab is active (for SPA navigation)
+  const filesTab = document.querySelector('[data-tab-item="pr-files-tab"]');
+  if (filesTab?.getAttribute('aria-current') === 'page') {
+    return true;
+  }
+
+  // Check if files container exists (files are loaded)
+  const filesContainer = document.querySelector('#files');
+  if (filesContainer) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Create hidden comment with order data
  * @param {Array<string>} order - File order
  * @param {Object} [metadata={}] - Additional metadata

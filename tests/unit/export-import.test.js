@@ -48,9 +48,9 @@ describe('Export/Import Functionality', () => {
       expect(() => exportOrderToJSON([], 'org/repo/1', 'user')).toThrow(
         'Order cannot be empty'
       );
-      expect(() =>
-        exportOrderToJSON(['file.js'], '', 'user')
-      ).toThrow('PR ID is required');
+      expect(() => exportOrderToJSON(['file.js'], '', 'user')).toThrow(
+        'PR ID is required'
+      );
     });
   });
 
@@ -232,9 +232,7 @@ describe('Export/Import Functionality', () => {
         order: 'not-an-array',
       };
 
-      expect(() => validateImportData(data)).toThrow(
-        'Order must be an array'
-      );
+      expect(() => validateImportData(data)).toThrow('Order must be an array');
     });
 
     it('should throw for empty order', () => {
@@ -245,9 +243,7 @@ describe('Export/Import Functionality', () => {
         order: [],
       };
 
-      expect(() => validateImportData(data)).toThrow(
-        'Order cannot be empty'
-      );
+      expect(() => validateImportData(data)).toThrow('Order cannot be empty');
     });
 
     it('should throw for unsupported version', () => {

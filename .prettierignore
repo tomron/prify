@@ -3,3 +3,6 @@ coverage
 .github
 *.md
 package-lock.json
+dist
+playwright-report
+test-results

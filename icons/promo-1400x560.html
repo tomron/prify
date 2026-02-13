@@ -1,142 +1,174 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>PR File Reorder - Promotional Image</title>
-  <style>
-    body {
-      margin: 0;
-      width: 1400px;
-      height: 560px;
-      background: linear-gradient(135deg, #2da44e 0%, #1a7f37 100%);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      color: white;
-      overflow: hidden;
-      padding: 0 80px;
-      box-sizing: border-box;
-    }
-    .left-content {
-      flex: 1;
-      max-width: 600px;
-    }
-    .icon {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 32px;
-    }
-    h1 {
-      margin: 0 0 16px 0;
-      font-size: 64px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-    .tagline {
-      margin: 0 0 24px 0;
-      font-size: 28px;
-      opacity: 0.95;
-      line-height: 1.4;
-    }
-    .description {
-      font-size: 18px;
-      opacity: 0.9;
-      line-height: 1.6;
-    }
-    .right-content {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mockup {
-      background: rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 32px;
-      backdrop-filter: blur(10px);
-    }
-    .file-list {
-      background: white;
-      border-radius: 8px;
-      padding: 16px;
-      width: 320px;
-    }
-    .file {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      margin: 8px 0;
-      background: #f6f8fa;
-      border-radius: 6px;
-      color: #24292f;
-      font-size: 14px;
-    }
-    .file-icon {
-      width: 8px;
-      height: 8px;
-      background: #1a7f37;
-      border-radius: 2px;
-      margin-right: 12px;
-    }
-    .drag-handle {
-      margin-left: auto;
-      color: #6e7781;
-      font-size: 18px;
-    }
-  </style>
-</head>
-<body>
-  <div class="left-content">
-    <div class="icon">
-      <svg width="100" height="100" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-        <rect width="128" height="128" rx="24" fill="rgba(255,255,255,0.25)"/>
-        <g transform="translate(28, 24)">
-          <rect x="0" y="0" width="72" height="16" rx="3" fill="#ffffff"/>
-          <rect x="4" y="4" width="32" height="8" rx="1.5" fill="#1a7f37"/>
-          <g transform="translate(58, 24)">
-            <path d="M 7 0 L 0 7 L 3 7 L 3 17 L 11 17 L 11 7 L 14 7 Z" fill="#ffffff"/>
+  <head>
+    <meta charset="utf-8" />
+    <title>PR File Reorder - Promotional Image</title>
+    <style>
+      body {
+        margin: 0;
+        width: 1400px;
+        height: 560px;
+        background: linear-gradient(135deg, #2da44e 0%, #1a7f37 100%);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: white;
+        overflow: hidden;
+        padding: 0 80px;
+        box-sizing: border-box;
+      }
+      .left-content {
+        flex: 1;
+        max-width: 600px;
+      }
+      .icon {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 32px;
+      }
+      h1 {
+        margin: 0 0 16px 0;
+        font-size: 64px;
+        font-weight: 700;
+        line-height: 1.1;
+      }
+      .tagline {
+        margin: 0 0 24px 0;
+        font-size: 28px;
+        opacity: 0.95;
+        line-height: 1.4;
+      }
+      .description {
+        font-size: 18px;
+        opacity: 0.9;
+        line-height: 1.6;
+      }
+      .right-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .mockup {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 32px;
+        backdrop-filter: blur(10px);
+      }
+      .file-list {
+        background: white;
+        border-radius: 8px;
+        padding: 16px;
+        width: 320px;
+      }
+      .file {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin: 8px 0;
+        background: #f6f8fa;
+        border-radius: 6px;
+        color: #24292f;
+        font-size: 14px;
+      }
+      .file-icon {
+        width: 8px;
+        height: 8px;
+        background: #1a7f37;
+        border-radius: 2px;
+        margin-right: 12px;
+      }
+      .drag-handle {
+        margin-left: auto;
+        color: #6e7781;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="left-content">
+      <div class="icon">
+        <svg
+          width="100"
+          height="100"
+          viewBox="0 0 128 128"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            width="128"
+            height="128"
+            rx="24"
+            fill="rgba(255,255,255,0.25)"
+          />
+          <g transform="translate(28, 24)">
+            <rect x="0" y="0" width="72" height="16" rx="3" fill="#ffffff" />
+            <rect x="4" y="4" width="32" height="8" rx="1.5" fill="#1a7f37" />
+            <g transform="translate(58, 24)">
+              <path
+                d="M 7 0 L 0 7 L 3 7 L 3 17 L 11 17 L 11 7 L 14 7 Z"
+                fill="#ffffff"
+              />
+            </g>
+            <rect
+              x="0"
+              y="48"
+              width="72"
+              height="16"
+              rx="3"
+              fill="#ffffff"
+              opacity="0.95"
+            />
+            <rect x="4" y="52" width="48" height="8" rx="1.5" fill="#1a7f37" />
+            <rect
+              x="0"
+              y="72"
+              width="72"
+              height="16"
+              rx="3"
+              fill="#ffffff"
+              opacity="0.95"
+            />
+            <rect x="4" y="76" width="24" height="8" rx="1.5" fill="#1a7f37" />
           </g>
-          <rect x="0" y="48" width="72" height="16" rx="3" fill="#ffffff" opacity="0.95"/>
-          <rect x="4" y="52" width="48" height="8" rx="1.5" fill="#1a7f37"/>
-          <rect x="0" y="72" width="72" height="16" rx="3" fill="#ffffff" opacity="0.95"/>
-          <rect x="4" y="76" width="24" height="8" rx="1.5" fill="#1a7f37"/>
-        </g>
-      </svg>
+        </svg>
+      </div>
+      <h1>Review Code<br />Your Way</h1>
+      <p class="tagline">
+        Collaborative file ordering for GitHub Pull Requests
+      </p>
+      <p class="description">
+        Stop fighting with alphabetical order. Let your team decide which files
+        to review first. Pure democracy, zero infrastructure, seamlessly
+        integrated.
+      </p>
     </div>
-    <h1>Review Code<br>Your Way</h1>
-    <p class="tagline">Collaborative file ordering for GitHub Pull Requests</p>
-    <p class="description">
-      Stop fighting with alphabetical order. Let your team decide which files to review first.
-      Pure democracy, zero infrastructure, seamlessly integrated.
-    </p>
-  </div>
 
-  <div class="right-content">
-    <div class="mockup">
-      <div class="file-list">
-        <div class="file">
-          <div class="file-icon"></div>
-          <span>src/core/auth.js</span>
-          <span class="drag-handle">⋮⋮</span>
-        </div>
-        <div class="file">
-          <div class="file-icon" style="width: 12px;"></div>
-          <span>src/utils/validator.js</span>
-          <span class="drag-handle">⋮⋮</span>
-        </div>
-        <div class="file">
-          <div class="file-icon" style="width: 6px;"></div>
-          <span>README.md</span>
-          <span class="drag-handle">⋮⋮</span>
-        </div>
-        <div class="file">
-          <div class="file-icon" style="width: 16px;"></div>
-          <span>tests/auth.test.js</span>
-          <span class="drag-handle">⋮⋮</span>
+    <div class="right-content">
+      <div class="mockup">
+        <div class="file-list">
+          <div class="file">
+            <div class="file-icon"></div>
+            <span>src/core/auth.js</span>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
+          <div class="file">
+            <div class="file-icon" style="width: 12px"></div>
+            <span>src/utils/validator.js</span>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
+          <div class="file">
+            <div class="file-icon" style="width: 6px"></div>
+            <span>README.md</span>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
+          <div class="file">
+            <div class="file-icon" style="width: 16px"></div>
+            <span>tests/auth.test.js</span>
+            <span class="drag-handle">⋮⋮</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

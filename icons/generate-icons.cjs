@@ -15,7 +15,9 @@ let sharp;
 try {
   sharp = require('sharp');
 } catch (e) {
-  console.log('Sharp not installed. Install with: npm install --save-dev sharp');
+  console.log(
+    'Sharp not installed. Install with: npm install --save-dev sharp'
+  );
   console.log('Falling back to manual SVG copies...');
 
   // Just copy the SVG to different names
@@ -38,10 +40,7 @@ async function generateIcons() {
     const outputPath = path.join(__dirname, `icon${size}.png`);
 
     try {
-      await sharp(iconPath)
-        .resize(size, size)
-        .png()
-        .toFile(outputPath);
+      await sharp(iconPath).resize(size, size).png().toFile(outputPath);
 
       console.log(`✓ Generated icon${size}.png`);
     } catch (error) {

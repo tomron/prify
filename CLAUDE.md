@@ -55,12 +55,15 @@ The user (Tom) is head of AI transportation and DevEx, has a Rugby Sevens backgr
 
 **CRITICAL WORKFLOW - Run BEFORE every commit**:
 ```bash
+npm run build        # Build the extension bundle (creates dist/content.js)
 npm run lint          # Must pass with ZERO errors/warnings
 npm run format:check  # Must pass (or run npm run format to fix)
 npm test             # Must pass all tests
 ```
 
 **IMPORTANT**: Always run the critical workflow above before committing. All lint errors AND warnings must be fixed. Zero tolerance for lint/format failures.
+
+**Note on Build Step**: The extension uses Rollup to bundle ES modules into a single file because Chrome extensions don't fully support ES modules in content scripts. The bundled file is in `dist/` which is gitignored.
 
 ### Before Creating PR
 
@@ -667,14 +670,15 @@ element.textContent = userInput;
 ```bash
 # Development (IN THIS ORDER)
 npm install                 # Install dependencies
-npm run lint               # FIRST: Lint code (must pass)
-npm test                   # SECOND: Run all tests
+npm run build              # FIRST: Build extension bundle (dist/content.js)
+npm run build:watch        # Watch mode - auto-rebuild on changes
+npm run lint               # SECOND: Lint code (must pass)
+npm test                   # THIRD: Run all tests
 npm run test:watch         # Watch mode for development
 npm run test:e2e          # E2E tests only
-npm run build             # Build extension
 
 # Recommended workflow
-npm run lint && npm test && npm run build  # Run all checks
+npm run build && npm run lint && npm test  # Run all checks
 
 # Git workflow
 git worktree list         # List all worktrees

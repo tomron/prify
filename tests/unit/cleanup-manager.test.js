@@ -77,7 +77,7 @@ describe('Cleanup Manager', () => {
 
     expect(manager.hasTrackedResources()).toBe(false);
     expect(controller.signal.aborted).toBe(true);
-    
+
     // Wait to ensure timeout doesn't fire
     return new Promise((resolve) => {
       setTimeout(() => {

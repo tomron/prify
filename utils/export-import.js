@@ -141,16 +141,10 @@ export function validateImportData(data) {
   }
 
   // Validate prId and user
-  if (
-    typeof data.prId !== 'string' ||
-    data.prId.trim() === ''
-  ) {
+  if (typeof data.prId !== 'string' || data.prId.trim() === '') {
     throw new Error('PR ID must be a non-empty string');
   }
-  if (
-    typeof data.user !== 'string' ||
-    data.user.trim() === ''
-  ) {
+  if (typeof data.user !== 'string' || data.user.trim() === '') {
     throw new Error('User must be a non-empty string');
   }
 }

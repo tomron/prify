@@ -55,7 +55,9 @@ export function detectDOMStructureVersion() {
   // Check for known GitHub DOM patterns
   const indicators = {
     hasFiles: !!document.querySelector('.files'),
-    hasDiffContainer: !!document.querySelector('[data-target="diff-container"]'),
+    hasDiffContainer: !!document.querySelector(
+      '[data-target="diff-container"]'
+    ),
     hasProgressiveContainer: !!document.querySelector(
       '.js-diff-progressive-container'
     ),
@@ -114,6 +116,9 @@ export function getFilesContainer(container) {
       '.files',
       '[data-target="diff-container"]',
       '.js-diff-progressive-container',
+      '[data-hpc]', // New GitHub (Primer React Components)
+      'turbo-frame[id*="repo-content"]', // Turbo frame
+      '#diff-comparison-viewer-container', // New GitHub diff viewer
     ];
 
     for (let i = 0; i < selectors.length; i++) {
@@ -130,6 +135,18 @@ export function getFilesContainer(container) {
         parserStats.successfulExtractions++;
         return element;
       }
+    }
+
+    // Last resort: check if body has file elements
+    const bodyElement = document.querySelector('body');
+    if (
+      bodyElement &&
+      bodyElement.querySelector('.file, [data-file-type], [data-path]')
+    ) {
+      parserStats.fallbacksUsed++;
+      console.log('[PR-Reorder Parser] Using body as fallback container');
+      parserStats.successfulExtractions++;
+      return bodyElement;
     }
 
     logParserError(
@@ -164,19 +181,48 @@ export function extractFiles(container) {
     }
 
     // Try multiple selectors for file elements
-    const fileSelectors = ['.file', '[data-file-type]', '[data-path]'];
+    // Order matters: try most specific first
+    const fileSelectors = [
+      '.file', // Old GitHub
+      '[data-file-type]', // Old GitHub
+      '[data-path]', // Old GitHub
+      '[id^="diff-"]', // New GitHub - actual diff containers
+      'div[id^="diff-"]', // More specific diff containers
+      '[data-file-path]', // New GitHub - but may match buttons, not files
+    ];
 
     for (let i = 0; i < fileSelectors.length; i++) {
       const selector = fileSelectors[i];
-      const files = filesContainer.querySelectorAll(selector);
+      let files = Array.from(filesContainer.querySelectorAll(selector));
+
+      // Filter out non-file elements
+      if (selector.includes('diff-')) {
+        // For diff- selectors, filter to only file diffs (have actual file content)
+        files = files.filter((el) => {
+          // File IDs are like: diff-{64-char-hex-hash}
+          // Exclude: diff-comparison-viewer-container, diff-file-tree-filter, diff-placeholder
+          const isLongHash = el.id && el.id.match(/^diff-[a-f0-9]{64}$/);
+          const isContainer =
+            el.id &&
+            (el.id.includes('container') ||
+              el.id.includes('viewer') ||
+              el.id.includes('filter') ||
+              el.id.includes('placeholder'));
+
+          return isLongHash && !isContainer;
+        });
+      }
+
       if (files.length > 0) {
         if (i > 0) {
           // Used a fallback selector
           parserStats.fallbacksUsed++;
-          console.log(`[PR-Reorder Parser] Used fallback file selector: ${selector}`);
+          console.log(
+            `[PR-Reorder Parser] Used fallback file selector: ${selector} (${files.length} files)`
+          );
         }
         parserStats.successfulExtractions++;
-        return Array.from(files);
+        return files;
       }
     }
 
@@ -214,6 +260,34 @@ export function getFilePath(fileElement) {
       return fileElement.dataset.path;
     }
 
+    // Try data-file-path (new GitHub)
+    if (fileElement.dataset && fileElement.dataset.filePath) {
+      return fileElement.dataset.filePath;
+    }
+
+    // Try to extract from heading (new GitHub - most common)
+    const heading = fileElement.querySelector('h2, h3, [role="heading"]');
+    if (heading && heading.textContent) {
+      // Remove directional marks and trim
+      const path = heading.textContent
+        .replace(/[\u200E\u200F]/g, '') // Remove LTR/RTL marks
+        .trim();
+      if (path && !path.includes('\n')) {
+        // Valid single-line path
+        parserStats.fallbacksUsed++;
+        return path;
+      }
+    }
+
+    // Try to extract from ID (diff-{hash}--{path})
+    if (fileElement.id && fileElement.id.startsWith('diff-')) {
+      const pathMatch = fileElement.id.match(/diff-[^-]+--(.*)/);
+      if (pathMatch) {
+        parserStats.fallbacksUsed++;
+        return decodeURIComponent(pathMatch[1]);
+      }
+    }
+
     // Try to find file path in .file-info a element
     const fileInfo = fileElement.querySelector('.file-info a');
     if (fileInfo && fileInfo.textContent) {
@@ -222,10 +296,15 @@ export function getFilePath(fileElement) {
     }
 
     // Try other common selectors
-    const titleElement = fileElement.querySelector('[data-path]');
-    if (titleElement && titleElement.dataset && titleElement.dataset.path) {
-      parserStats.fallbacksUsed++;
-      return titleElement.dataset.path;
+    const titleElement = fileElement.querySelector(
+      '[data-path], [data-file-path]'
+    );
+    if (titleElement) {
+      const path = titleElement.dataset.path || titleElement.dataset.filePath;
+      if (path) {
+        parserStats.fallbacksUsed++;
+        return path;
+      }
     }
 
     // Try the file header link

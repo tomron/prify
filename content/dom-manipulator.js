@@ -117,19 +117,60 @@ export function reorderFiles(order, container) {
   // Add files in specified order
   order.forEach((filePath) => {
     const fileElement = fileMap.get(filePath);
-    if (fileElement && fileElement.parentNode === filesContainer) {
+    if (fileElement && filesContainer.contains(fileElement)) {
+      // Get the element to actually move (might be wrapped in a parent div)
+      let elementToMove = fileElement;
+
+      // If file is not a direct child, find the wrapper that is
+      if (fileElement.parentNode !== filesContainer) {
+        let parent = fileElement.parentNode;
+        while (
+          parent &&
+          parent.parentNode !== filesContainer &&
+          parent !== filesContainer
+        ) {
+          parent = parent.parentNode;
+        }
+        if (parent && parent !== filesContainer) {
+          elementToMove = parent;
+        }
+      }
+
       // Remove from DOM and add to fragment
-      filesContainer.removeChild(fileElement);
-      fragment.appendChild(fileElement);
-      fileMap.delete(filePath); // Mark as processed
+      if (elementToMove.parentNode) {
+        elementToMove.parentNode.removeChild(elementToMove);
+        fragment.appendChild(elementToMove);
+        fileMap.delete(filePath); // Mark as processed
+      }
     }
   });
 
   // Add any remaining files (not in order) at the end
   fileMap.forEach((fileElement) => {
-    if (fileElement.parentNode === filesContainer) {
-      filesContainer.removeChild(fileElement);
-      fragment.appendChild(fileElement);
+    if (filesContainer.contains(fileElement)) {
+      // Get the element to actually move
+      let elementToMove = fileElement;
+
+      // If file is not a direct child, find the wrapper that is
+      if (fileElement.parentNode !== filesContainer) {
+        let parent = fileElement.parentNode;
+        while (
+          parent &&
+          parent.parentNode !== filesContainer &&
+          parent !== filesContainer
+        ) {
+          parent = parent.parentNode;
+        }
+        if (parent && parent !== filesContainer) {
+          elementToMove = parent;
+        }
+      }
+
+      // Remove from DOM and add to fragment
+      if (elementToMove.parentNode) {
+        elementToMove.parentNode.removeChild(elementToMove);
+        fragment.appendChild(elementToMove);
+      }
     }
   });
 
