@@ -165,8 +165,8 @@ export function createVirtualScroller(options) {
     topSpacer.style.height = `${visibleStart * itemHeight}px`;
     bottomSpacer.style.height = `${(items.length - visibleEnd) * itemHeight}px`;
 
-    // Clear content
-    content.innerHTML = '';
+    // SECURITY: Clear content safely using replaceChildren()
+    content.replaceChildren();
 
     // Render visible items
     for (let i = visibleStart; i < visibleEnd; i++) {
@@ -190,7 +190,8 @@ export function createVirtualScroller(options) {
     },
     destroy: () => {
       container.removeEventListener('scroll', handleScroll);
-      container.innerHTML = '';
+      // SECURITY: Clear safely using replaceChildren()
+      container.replaceChildren();
     },
   };
 }

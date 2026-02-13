@@ -3,6 +3,8 @@
  * Store and retrieve file orders from GitHub PR comments
  */
 
+import { validateOrderCommentData } from '../utils/sanitizer.js';
+
 const COMMENT_PREFIX = 'pr-file-order-data';
 const CURRENT_VERSION = '1.0';
 
@@ -82,6 +84,7 @@ export function createOrderComment(order, metadata = {}) {
 
 /**
  * Parse order from comment HTML
+ * SECURITY: Validates and sanitizes all parsed data
  * @param {string} commentHTML - Comment HTML content
  * @returns {Object|null} Parsed order data or null
  */
@@ -94,15 +97,22 @@ export function parseOrderComment(commentHTML) {
   }
 
   try {
-    return JSON.parse(match[1]);
+    const parsed = JSON.parse(match[1]);
+
+    // SECURITY: Validate and sanitize parsed data before returning
+    return validateOrderCommentData(parsed);
   } catch (error) {
-    console.error('[PR-Reorder] Failed to parse order comment:', error);
+    console.error(
+      '[PR-Reorder] Failed to parse/validate order comment:',
+      error
+    );
     return null;
   }
 }
 
 /**
  * Extract all orders from PR comments
+ * SECURITY: Reads comment HTML safely - only for parsing, never injecting
  * @returns {Array<Object>} Array of order data objects
  */
 export function extractOrdersFromComments() {
@@ -110,8 +120,11 @@ export function extractOrdersFromComments() {
   const commentBodies = document.querySelectorAll('.comment-body');
 
   commentBodies.forEach((commentBody) => {
-    // SECURITY: Using innerHTML to read existing comment HTML (read-only operation)
-    // This is safe because we're only parsing, not injecting content
+    // SECURITY: We need to read the comment HTML to find our hidden comments.
+    // This is safe because:
+    // 1. We're reading from GitHub's DOM (already sanitized by GitHub)
+    // 2. We only parse JSON from HTML comments, never inject HTML
+    // 3. All parsed data goes through validateOrderCommentData()
     const html = commentBody.innerHTML;
     const orderData = parseOrderComment(html);
 
