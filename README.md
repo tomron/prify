@@ -44,6 +44,13 @@ This extension solves a real DevEx problem: GitHub's alphabetical file ordering 
 
 _Coming soon: Chrome Web Store link_
 
+## Documentation
+
+- 📖 **[User Guide](docs/USER_GUIDE.md)** - Complete guide to using the extension
+- ❓ **[FAQ](docs/FAQ.md)** - Frequently asked questions
+- 🔧 **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Fix common issues
+- 👩‍💻 **[Developer Guide](CLAUDE.md)** - For contributors
+
 ## Development
 
 ### Project Structure
