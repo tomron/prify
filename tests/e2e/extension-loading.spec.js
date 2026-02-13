@@ -23,7 +23,7 @@ test.describe('Extension Loading', () => {
 
     const contentScript = manifest.content_scripts[0];
     expect(contentScript.matches).toContain('https://github.com/*/pull/*');
-    expect(contentScript.js).toContain('content/content.js');
+    expect(contentScript.js).toContain('dist/content.js');
   });
 
   test('should have all required files present', async () => {
@@ -32,7 +32,7 @@ test.describe('Extension Loading', () => {
     // Check required files exist
     const requiredFiles = [
       'manifest.json',
-      'content/content.js',
+      'dist/content.js', // Bundled version
       'ui/styles.css',
     ];
 
@@ -43,7 +43,7 @@ test.describe('Extension Loading', () => {
   });
 
   test('should have valid content script', async () => {
-    const contentPath = path.join(__dirname, '../../content/content.js');
+    const contentPath = path.join(__dirname, '../../dist/content.js');
     const content = fs.readFileSync(contentPath, 'utf-8');
 
     // Verify content script has basic structure

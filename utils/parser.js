@@ -139,7 +139,10 @@ export function getFilesContainer(container) {
 
     // Last resort: check if body has file elements
     const bodyElement = document.querySelector('body');
-    if (bodyElement && bodyElement.querySelector('.file, [data-file-type], [data-path]')) {
+    if (
+      bodyElement &&
+      bodyElement.querySelector('.file, [data-file-type], [data-path]')
+    ) {
       parserStats.fallbacksUsed++;
       console.log('[PR-Reorder Parser] Using body as fallback container');
       parserStats.successfulExtractions++;
@@ -297,8 +300,7 @@ export function getFilePath(fileElement) {
       '[data-path], [data-file-path]'
     );
     if (titleElement) {
-      const path =
-        titleElement.dataset.path || titleElement.dataset.filePath;
+      const path = titleElement.dataset.path || titleElement.dataset.filePath;
       if (path) {
         parserStats.fallbacksUsed++;
         return path;

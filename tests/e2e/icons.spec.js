@@ -66,7 +66,7 @@ test.describe('Extension Icons', () => {
       expect(fs.existsSync(filePath)).toBe(true);
 
       const fileContent = fs.readFileSync(filePath, 'utf8');
-      expect(fileContent).toContain('<!DOCTYPE html>');
+      expect(fileContent.toLowerCase()).toContain('<!doctype html>');
       expect(fileContent).toContain('PR File Reorder');
     });
   });
