@@ -5,6 +5,8 @@
 
 import { getCurrentOrder } from '../content/dom-manipulator.js';
 import { extractAllFilesMetadata } from '../utils/parser.js';
+import { getAllPresets, applyPreset } from '../utils/presets.js';
+import { savePreference, loadPreference } from '../utils/storage.js';
 
 /**
  * Create and show reorder modal
@@ -25,6 +27,7 @@ export function createReorderModal(options = {}) {
   const overlay = createModalOverlay();
   const modal = createModalDialog();
   const header = createModalHeader();
+  const presetBar = createPresetBar();
   const body = createModalBody();
   const footer = createModalFooter();
 
@@ -34,23 +37,18 @@ export function createReorderModal(options = {}) {
   // Assemble modal
   body.appendChild(fileList);
   modal.appendChild(header);
+  modal.appendChild(presetBar);
   modal.appendChild(body);
   modal.appendChild(footer);
   overlay.appendChild(modal);
 
-  // Track drag state
-  let draggedElement = null;
-  let draggedIndex = null;
-
   // Setup drag and drop
   setupDragAndDrop(fileList, {
-    onDragStart: (element, index) => {
-      draggedElement = element;
-      draggedIndex = index;
+    onDragStart: () => {
+      // Drag started
     },
     onDragEnd: () => {
-      draggedElement = null;
-      draggedIndex = null;
+      // Drag ended
     },
   });
 
@@ -61,6 +59,7 @@ export function createReorderModal(options = {}) {
   const closeBtn = header.querySelector('.pr-reorder-modal-close');
   const cancelBtn = footer.querySelector('[data-action="cancel"]');
   const saveBtn = footer.querySelector('[data-action="save"]');
+  const presetSelect = presetBar.querySelector('.pr-reorder-preset-select');
 
   const close = () => {
     overlay.remove();
@@ -76,6 +75,35 @@ export function createReorderModal(options = {}) {
   closeBtn.addEventListener('click', close);
   cancelBtn.addEventListener('click', close);
   saveBtn.addEventListener('click', save);
+
+  // Handle preset selection
+  presetSelect.addEventListener('change', async (e) => {
+    const presetId = e.target.value;
+
+    if (!presetId) {
+      return;
+    }
+
+    try {
+      // Apply preset
+      const sorted = applyPreset(presetId, filesMetadata);
+
+      // Update file list
+      updateFileList(fileList, sorted);
+
+      // Save last used preset
+      await savePreference('lastPreset', presetId);
+    } catch (error) {
+      console.error('Failed to apply preset:', error);
+    }
+  });
+
+  // Load and set last used preset
+  loadPreference('lastPreset').then((lastPreset) => {
+    if (lastPreset) {
+      presetSelect.value = lastPreset;
+    }
+  });
 
   // Close on overlay click
   overlay.addEventListener('click', (e) => {
@@ -159,6 +187,45 @@ function createModalHeader() {
   header.appendChild(closeBtn);
 
   return header;
+}
+
+/**
+ * Create preset bar with dropdown
+ * @returns {HTMLElement}
+ */
+function createPresetBar() {
+  const bar = document.createElement('div');
+  bar.className = 'pr-reorder-preset-bar';
+
+  const label = document.createElement('label');
+  label.className = 'pr-reorder-preset-label';
+  label.textContent = 'Quick sort:';
+  label.setAttribute('for', 'pr-reorder-preset-select');
+
+  const select = document.createElement('select');
+  select.id = 'pr-reorder-preset-select';
+  select.className = 'pr-reorder-preset-select';
+
+  // Add default option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Choose a preset...';
+  select.appendChild(defaultOption);
+
+  // Add preset options
+  const presets = getAllPresets();
+  presets.forEach((preset) => {
+    const option = document.createElement('option');
+    option.value = preset.id;
+    option.textContent = preset.name;
+    option.title = preset.description;
+    select.appendChild(option);
+  });
+
+  bar.appendChild(label);
+  bar.appendChild(select);
+
+  return bar;
 }
 
 /**
@@ -451,4 +518,37 @@ function updateAriaLabels(list) {
  */
 function getOrderFromList(list) {
   return Array.from(list.children).map((item) => item.dataset.path);
+}
+
+/**
+ * Update file list with new order
+ * @param {HTMLElement} list - File list element
+ * @param {Array<Object>} filesMetadata - Sorted file metadata
+ */
+function updateFileList(list, filesMetadata) {
+  // Create a map of existing items by path for reuse
+  const existingItems = new Map();
+  Array.from(list.children).forEach((item) => {
+    existingItems.set(item.dataset.path, item);
+  });
+
+  // Clear the list
+  list.innerHTML = '';
+
+  // Add files in new order
+  filesMetadata.forEach((metadata, index) => {
+    const existingItem = existingItems.get(metadata.path);
+    if (existingItem) {
+      // Reuse existing item to preserve event listeners
+      existingItem.setAttribute(
+        'aria-label',
+        `${metadata.path}, position ${index + 1}`
+      );
+      list.appendChild(existingItem);
+    } else {
+      // Create new item if not found
+      const item = createFileItem(metadata, index);
+      list.appendChild(item);
+    }
+  });
 }

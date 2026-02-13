@@ -255,3 +255,92 @@ export async function getStorageStats() {
     }, null),
   };
 }
+
+const PREFERENCES_KEY = 'pr-reorder:preferences';
+
+/**
+ * Save a user preference
+ * @param {string} key - Preference key
+ * @param {*} value - Preference value
+ * @returns {Promise<void>}
+ */
+export async function savePreference(key, value) {
+  if (!key || typeof key !== 'string') {
+    throw new Error('Preference key is required');
+  }
+
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([PREFERENCES_KEY], (result) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+
+      const preferences = result[PREFERENCES_KEY] || {};
+      preferences[key] = value;
+
+      chrome.storage.local.set({ [PREFERENCES_KEY]: preferences }, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
+}
+
+/**
+ * Load a user preference
+ * @param {string} key - Preference key
+ * @param {*} defaultValue - Default value if preference not found
+ * @returns {Promise<*>} Preference value or default
+ */
+export async function loadPreference(key, defaultValue = null) {
+  if (!key || typeof key !== 'string') {
+    throw new Error('Preference key is required');
+  }
+
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([PREFERENCES_KEY], (result) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+
+      const preferences = result[PREFERENCES_KEY] || {};
+      resolve(preferences[key] !== undefined ? preferences[key] : defaultValue);
+    });
+  });
+}
+
+/**
+ * Delete a user preference
+ * @param {string} key - Preference key
+ * @returns {Promise<void>}
+ */
+export async function deletePreference(key) {
+  if (!key || typeof key !== 'string') {
+    throw new Error('Preference key is required');
+  }
+
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([PREFERENCES_KEY], (result) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+
+      const preferences = result[PREFERENCES_KEY] || {};
+      delete preferences[key];
+
+      chrome.storage.local.set({ [PREFERENCES_KEY]: preferences }, () => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
+}
