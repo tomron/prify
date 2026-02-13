@@ -1,63 +1,205 @@
 /**
  * GitHub DOM Parser
  * Utilities for extracting file information from GitHub PR pages
+ *
+ * BUG-004: Enhanced with error boundaries and DOM structure detection
  */
+
+// Parser error types
+export const ParserErrorType = {
+  CONTAINER_NOT_FOUND: 'container_not_found',
+  NO_FILES_FOUND: 'no_files_found',
+  INVALID_FILE_ELEMENT: 'invalid_file_element',
+  DOM_STRUCTURE_CHANGED: 'dom_structure_changed',
+  EXTRACTION_ERROR: 'extraction_error',
+};
+
+// Parser statistics for monitoring
+let parserStats = {
+  successfulExtractions: 0,
+  failedExtractions: 0,
+  fallbacksUsed: 0,
+  lastError: null,
+  domStructureVersion: null,
+};
+
+/**
+ * Get parser statistics
+ * BUG-004: For monitoring and debugging
+ * @returns {Object} Parser statistics
+ */
+export function getParserStats() {
+  return { ...parserStats };
+}
+
+/**
+ * Reset parser statistics
+ * BUG-004: For testing
+ */
+export function resetParserStats() {
+  parserStats = {
+    successfulExtractions: 0,
+    failedExtractions: 0,
+    fallbacksUsed: 0,
+    lastError: null,
+    domStructureVersion: null,
+  };
+}
+
+/**
+ * Detect GitHub PR DOM structure version
+ * BUG-004: Helps identify when GitHub changes DOM
+ * @returns {string} Detected version identifier
+ */
+export function detectDOMStructureVersion() {
+  // Check for known GitHub DOM patterns
+  const indicators = {
+    hasFiles: !!document.querySelector('.files'),
+    hasDiffContainer: !!document.querySelector('[data-target="diff-container"]'),
+    hasProgressiveContainer: !!document.querySelector(
+      '.js-diff-progressive-container'
+    ),
+    hasFileInfo: !!document.querySelector('.file-info'),
+    hasFileHeader: !!document.querySelector('.file-header'),
+  };
+
+  const version = Object.entries(indicators)
+    .filter(([, present]) => present)
+    .map(([key]) => key)
+    .sort()
+    .join('|');
+
+  parserStats.domStructureVersion = version || 'unknown';
+  return version || 'unknown';
+}
+
+/**
+ * Log parser error
+ * BUG-004: Centralized error logging
+ * @param {string} errorType - Error type
+ * @param {string} message - Error message
+ * @param {*} context - Additional context
+ */
+function logParserError(errorType, message, context = null) {
+  const error = {
+    type: errorType,
+    message,
+    context,
+    timestamp: new Date().toISOString(),
+    domVersion: parserStats.domStructureVersion,
+  };
+
+  parserStats.lastError = error;
+  parserStats.failedExtractions++;
+
+  console.error('[PR-Reorder Parser]', message, error);
+}
 
 /**
  * Get the files container element
+ * BUG-004: Enhanced with error boundaries and fallback tracking
  * @param {HTMLElement} [container] - Optional container to use instead of searching document
  * @returns {HTMLElement|null} The files container or null if not found
  */
 export function getFilesContainer(container) {
-  // If container provided, return it
-  if (container) {
-    return container;
-  }
-
-  // Try multiple selectors for GitHub's files container
-  const selectors = [
-    '.files',
-    '[data-target="diff-container"]',
-    '.js-diff-progressive-container',
-  ];
-
-  for (const selector of selectors) {
-    const element = document.querySelector(selector);
-    if (element) {
-      return element;
+  try {
+    // If container provided, return it
+    if (container) {
+      parserStats.successfulExtractions++;
+      return container;
     }
-  }
 
-  return null;
+    // Try multiple selectors for GitHub's files container
+    const selectors = [
+      '.files',
+      '[data-target="diff-container"]',
+      '.js-diff-progressive-container',
+    ];
+
+    for (let i = 0; i < selectors.length; i++) {
+      const selector = selectors[i];
+      const element = document.querySelector(selector);
+      if (element) {
+        if (i > 0) {
+          // Used a fallback selector
+          parserStats.fallbacksUsed++;
+          console.log(
+            `[PR-Reorder Parser] Used fallback selector: ${selector}`
+          );
+        }
+        parserStats.successfulExtractions++;
+        return element;
+      }
+    }
+
+    logParserError(
+      ParserErrorType.CONTAINER_NOT_FOUND,
+      'Files container not found with any selector',
+      { selectors }
+    );
+
+    return null;
+  } catch (error) {
+    logParserError(
+      ParserErrorType.EXTRACTION_ERROR,
+      'Error in getFilesContainer',
+      error
+    );
+    return null;
+  }
 }
 
 /**
  * Extract all file elements from the PR
+ * BUG-004: Enhanced with error boundaries and logging
  * @param {HTMLElement} [container] - Optional container to extract from
  * @returns {HTMLElement[]} Array of file elements
  */
 export function extractFiles(container) {
-  const filesContainer = getFilesContainer(container);
+  try {
+    const filesContainer = getFilesContainer(container);
 
-  if (!filesContainer) {
+    if (!filesContainer) {
+      return [];
+    }
+
+    // Try multiple selectors for file elements
+    const fileSelectors = ['.file', '[data-file-type]', '[data-path]'];
+
+    for (let i = 0; i < fileSelectors.length; i++) {
+      const selector = fileSelectors[i];
+      const files = filesContainer.querySelectorAll(selector);
+      if (files.length > 0) {
+        if (i > 0) {
+          // Used a fallback selector
+          parserStats.fallbacksUsed++;
+          console.log(`[PR-Reorder Parser] Used fallback file selector: ${selector}`);
+        }
+        parserStats.successfulExtractions++;
+        return Array.from(files);
+      }
+    }
+
+    logParserError(
+      ParserErrorType.NO_FILES_FOUND,
+      'No files found with any selector',
+      { selectors: fileSelectors }
+    );
+
+    return [];
+  } catch (error) {
+    logParserError(
+      ParserErrorType.EXTRACTION_ERROR,
+      'Error in extractFiles',
+      error
+    );
     return [];
   }
-
-  // Try multiple selectors for file elements
-  const fileSelectors = ['.file', '[data-file-type]', '[data-path]'];
-
-  for (const selector of fileSelectors) {
-    const files = filesContainer.querySelectorAll(selector);
-    if (files.length > 0) {
-      return Array.from(files);
-    }
-  }
-
-  return [];
 }
 
 /**
  * Extract file path from a file element
+ * BUG-004: Enhanced with error boundaries and fallback tracking
  * @param {HTMLElement} fileElement - The file element
  * @returns {string|null} The file path or null if not found
  */
@@ -66,30 +208,48 @@ export function getFilePath(fileElement) {
     return null;
   }
 
-  // Try data-path attribute first (most reliable)
-  if (fileElement.dataset.path) {
-    return fileElement.dataset.path;
-  }
+  try {
+    // Try data-path attribute first (most reliable)
+    if (fileElement.dataset && fileElement.dataset.path) {
+      return fileElement.dataset.path;
+    }
 
-  // Try to find file path in .file-info a element
-  const fileInfo = fileElement.querySelector('.file-info a');
-  if (fileInfo && fileInfo.textContent) {
-    return fileInfo.textContent.trim();
-  }
+    // Try to find file path in .file-info a element
+    const fileInfo = fileElement.querySelector('.file-info a');
+    if (fileInfo && fileInfo.textContent) {
+      parserStats.fallbacksUsed++;
+      return fileInfo.textContent.trim();
+    }
 
-  // Try other common selectors
-  const titleElement = fileElement.querySelector('[data-path]');
-  if (titleElement && titleElement.dataset.path) {
-    return titleElement.dataset.path;
-  }
+    // Try other common selectors
+    const titleElement = fileElement.querySelector('[data-path]');
+    if (titleElement && titleElement.dataset && titleElement.dataset.path) {
+      parserStats.fallbacksUsed++;
+      return titleElement.dataset.path;
+    }
 
-  // Try the file header link
-  const headerLink = fileElement.querySelector('.file-header a');
-  if (headerLink && headerLink.textContent) {
-    return headerLink.textContent.trim();
-  }
+    // Try the file header link
+    const headerLink = fileElement.querySelector('.file-header a');
+    if (headerLink && headerLink.textContent) {
+      parserStats.fallbacksUsed++;
+      return headerLink.textContent.trim();
+    }
 
-  return null;
+    logParserError(
+      ParserErrorType.INVALID_FILE_ELEMENT,
+      'Could not extract file path from element',
+      { element: fileElement.outerHTML?.substring(0, 200) }
+    );
+
+    return null;
+  } catch (error) {
+    logParserError(
+      ParserErrorType.EXTRACTION_ERROR,
+      'Error in getFilePath',
+      error
+    );
+    return null;
+  }
 }
 
 /**
