@@ -22,8 +22,9 @@
 
 ## Verifying It Works
 
-1. Navigate to a GitHub Pull Request (e.g., https://github.com/tomron/prify/pull/21)
+1. Navigate to a GitHub Pull Request (e.g., https://github.com/tomron/prify/pull/21/changes)
 2. **IMPORTANT: Click the "Files changed" tab** (the extension only works on this tab!)
+   - The URL should change to `/pull/{id}/changes` or `/pull/{id}/files`
 3. Open Chrome DevTools (F12 or Cmd+Option+I)
 4. Check the Console for logs:
    - `[PR-Reorder] Content script loaded`
