@@ -13,7 +13,12 @@ import {
 import { createReorderModal } from '../ui/reorder-modal.js';
 import { createOrderViewerModal } from '../ui/order-viewer.js';
 import { saveOrder } from '../utils/storage.js';
-import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
+import {
+  getPRId,
+  loadAllOrders,
+  saveOrderEverywhere,
+  isOnFilesTab,
+} from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
 import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
 
@@ -41,6 +46,14 @@ async function init() {
   const prId = getPRId();
   if (!prId) {
     console.log('[PR-Reorder] Not a PR page, skipping initialization');
+    return;
+  }
+
+  // Check if we're on the Files tab
+  if (!isOnFilesTab()) {
+    console.log(
+      '[PR-Reorder] Not on Files tab yet. Extension will activate when you navigate to Files.'
+    );
     return;
   }
 
