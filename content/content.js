@@ -3,7 +3,13 @@
  * Orchestrates all components to enable collaborative file ordering
  */
 
-import { getCurrentOrder, reorderFiles } from './dom-manipulator.js';
+import {
+  getCurrentOrder,
+  reorderFiles,
+  observeFileChanges,
+  reapplySavedOrder,
+  stopObserving,
+} from './dom-manipulator.js';
 import { createReorderModal } from '../ui/reorder-modal.js';
 import { createOrderViewerModal } from '../ui/order-viewer.js';
 import { saveOrder } from '../utils/storage.js';
@@ -14,6 +20,7 @@ import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
 // Extension state
 let extensionLoaded = false;
 let buttonsInjected = false;
+let currentConsensusOrder = null; // BUG-001: Store order for re-application
 
 /**
  * Initialize extension on GitHub PR pages
@@ -25,6 +32,9 @@ async function init() {
     cleanup();
     extensionLoaded = false;
     buttonsInjected = false;
+    // BUG-001: Reset consensus order on cleanup
+    currentConsensusOrder = null;
+    stopObserving();
   }
 
   // Verify we're on a PR page
@@ -39,7 +49,7 @@ async function init() {
   // Inject buttons
   injectButtons();
 
-  // Load and apply saved order
+  // Load and apply saved order (BUG-001: also sets up dynamic file observer)
   await applySavedOrder();
 
   // Mark as loaded
@@ -180,6 +190,7 @@ async function handleViewOrdersClick() {
 
 /**
  * Apply saved order from storage
+ * BUG-001: Also sets up observer for dynamic file loading
  */
 async function applySavedOrder() {
   const prId = getPRId();
@@ -204,9 +215,39 @@ async function applySavedOrder() {
         'user(s)'
       );
       reorderFiles(consensus);
+
+      // BUG-001: Store consensus for re-application when files load dynamically
+      currentConsensusOrder = consensus;
+
+      // BUG-001: Set up observer for dynamic file loading
+      setupDynamicFileObserver();
     }
   } catch (error) {
     console.error('[PR-Reorder] Failed to apply saved order:', error);
+  }
+}
+
+/**
+ * Setup observer for GitHub's dynamic file loading
+ * BUG-001: Re-applies order when new files are loaded
+ */
+function setupDynamicFileObserver() {
+  const manager = getCleanupManager();
+
+  // Stop any existing observer first
+  stopObserving();
+
+  // Create new observer
+  const observer = observeFileChanges(() => {
+    if (currentConsensusOrder && currentConsensusOrder.length > 0) {
+      console.log('[PR-Reorder] Dynamic files detected, re-applying order');
+      reapplySavedOrder(currentConsensusOrder);
+    }
+  }, 500); // 500ms debounce for dynamic loading
+
+  // BUG-001: Track observer for cleanup (BUG-002 integration)
+  if (observer) {
+    manager.trackObserver(observer);
   }
 }
 
