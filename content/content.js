@@ -78,6 +78,17 @@ async function init() {
 function injectButtons() {
   if (buttonsInjected) return;
 
+  // First, check if files have actually loaded
+  const filesExist = document.querySelectorAll('[data-path]').length > 0;
+  if (!filesExist) {
+    console.log('[PR-Reorder] Files not loaded yet, waiting...');
+    const manager = getCleanupManager();
+    manager.trackTimeout(injectButtons, 500);
+    return;
+  }
+
+  console.log('[PR-Reorder] Files detected, finding injection point...');
+
   // Find the file header (where "Files changed" is)
   // Try multiple selectors for GitHub's evolving DOM structure
   const selectors = [
@@ -86,6 +97,8 @@ function injectButtons() {
     '#files .diffbar', // Alternative location
     '.diff-view .file-actions', // Another alternative
     '#files', // Fallback - just find the files container
+    '[data-hpc]', // New GitHub structure (Primer React Components)
+    'turbo-frame[id*="repo-content"]', // Turbo frame container
   ];
 
   let fileHeader = null;
@@ -116,8 +129,10 @@ function injectButtons() {
       !!document.querySelector('#files'),
       'files_bucket:',
       !!document.querySelector('#files_bucket'),
-      'diffbar:',
-      !!document.querySelectorAll('.diffbar').length
+      'data-hpc:',
+      !!document.querySelector('[data-hpc]'),
+      'files with [data-path]:',
+      document.querySelectorAll('[data-path]').length
     );
     // BUG-002: Track timeout for cleanup
     const manager = getCleanupManager();
@@ -152,14 +167,21 @@ function injectButtons() {
   container.appendChild(viewBtn);
 
   // Inject into UI - use different strategies based on where we found the header
-  if (usedFallback && fileHeader.id === 'files') {
-    // If injecting into #files container, prepend with better styling
+  if (
+    usedFallback &&
+    (fileHeader.id === 'files' ||
+      fileHeader.hasAttribute('data-hpc') ||
+      fileHeader.tagName === 'TURBO-FRAME')
+  ) {
+    // If injecting into container (not a proper header), prepend with better styling
     container.style.cssText =
-      'display: flex; gap: 8px; padding: 16px; border-bottom: 1px solid #d0d7de; background: #f6f8fa;';
+      'display: flex; gap: 8px; padding: 16px; border-bottom: 1px solid #d0d7de; background: #f6f8fa; position: sticky; top: 0; z-index: 100;';
     fileHeader.insertBefore(container, fileHeader.firstChild);
+    console.log('[PR-Reorder] Injected into container (prepended)');
   } else {
     // Normal injection for proper header locations
     fileHeader.appendChild(container);
+    console.log('[PR-Reorder] Injected into header (appended)');
   }
 
   // BUG-002: Track injected element
