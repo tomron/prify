@@ -170,27 +170,45 @@ export function extractFiles(container) {
     }
 
     // Try multiple selectors for file elements
+    // Order matters: try most specific first
     const fileSelectors = [
-      '.file',
-      '[data-file-type]',
-      '[data-path]',
-      '[data-file-path]',
-      '[id^="diff-"]',
+      '.file', // Old GitHub
+      '[data-file-type]', // Old GitHub
+      '[data-path]', // Old GitHub
+      '[id^="diff-"]', // New GitHub - actual diff containers
+      'div[id^="diff-"]', // More specific diff containers
+      '[data-file-path]', // New GitHub - but may match buttons, not files
     ];
 
     for (let i = 0; i < fileSelectors.length; i++) {
       const selector = fileSelectors[i];
-      const files = filesContainer.querySelectorAll(selector);
+      let files = Array.from(filesContainer.querySelectorAll(selector));
+
+      // Filter out non-file elements
+      if (selector.includes('diff-')) {
+        // For diff- selectors, filter to only file diffs (have actual file content)
+        files = files.filter((el) => {
+          // Must have an ID that looks like: diff-{hash}-{hash}--{path}
+          // NOT like: diff-comparison-viewer-container
+          return (
+            el.id &&
+            el.id.match(/^diff-[a-f0-9]+-[a-f0-9]+--/) &&
+            !el.id.includes('container') &&
+            !el.id.includes('viewer')
+          );
+        });
+      }
+
       if (files.length > 0) {
         if (i > 0) {
           // Used a fallback selector
           parserStats.fallbacksUsed++;
           console.log(
-            `[PR-Reorder Parser] Used fallback file selector: ${selector}`
+            `[PR-Reorder Parser] Used fallback file selector: ${selector} (${files.length} files)`
           );
         }
         parserStats.successfulExtractions++;
-        return Array.from(files);
+        return files;
       }
     }
 
