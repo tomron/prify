@@ -23,14 +23,21 @@
 ## Verifying It Works
 
 1. Navigate to a GitHub Pull Request (e.g., https://github.com/tomron/prify/pull/21)
-2. Open Chrome DevTools (F12 or Cmd+Option+I)
-3. Check the Console for logs:
+2. **IMPORTANT: Click the "Files changed" tab** (the extension only works on this tab!)
+3. Open Chrome DevTools (F12 or Cmd+Option+I)
+4. Check the Console for logs:
    - `[PR-Reorder] Content script loaded`
    - `[PR-Reorder] Initializing on PR: ...`
    - `[PR-Reorder] Buttons injected`
-4. Look for two new buttons in the PR Files section:
+5. Look for two new buttons in the PR Files section:
    - **↕️ Reorder Files** - Opens drag-and-drop modal
    - **👥 View Orders** - Shows all user orders and consensus
+
+**Note**: If you're on the "Conversation" tab, you'll see the message:
+```
+[PR-Reorder] Not on Files tab yet. Extension will activate when you navigate to Files.
+```
+This is expected! Just click "Files changed" to activate the extension.
 
 ## After Making Changes
 
