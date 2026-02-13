@@ -732,3 +732,233 @@
     display: none !important;
   }
 }
+
+/* === Order Diff Viewer === */
+.pr-reorder-diff-modal {
+  max-width: 700px;
+}
+
+.pr-reorder-diff-labels {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.pr-reorder-diff-label {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.pr-reorder-diff-label-a {
+  background-color: #ddf4ff;
+  color: #0969da;
+}
+
+.pr-reorder-diff-label-b {
+  background-color: #fff8c5;
+  color: #9a6700;
+}
+
+.pr-reorder-diff-vs {
+  color: #57606a;
+  font-weight: 500;
+}
+
+.pr-reorder-diff-body {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* Diff Stats */
+.pr-reorder-diff-stats {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.pr-reorder-diff-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.pr-reorder-diff-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.pr-reorder-diff-stat-label {
+  font-size: 12px;
+  color: #57606a;
+  font-weight: 500;
+}
+
+.pr-reorder-diff-stat-unchanged .pr-reorder-diff-stat-value {
+  color: #57606a;
+}
+
+.pr-reorder-diff-stat-moved-up .pr-reorder-diff-stat-value {
+  color: #0969da;
+}
+
+.pr-reorder-diff-stat-moved-down .pr-reorder-diff-stat-value {
+  color: #9a6700;
+}
+
+.pr-reorder-diff-stat-added .pr-reorder-diff-stat-value {
+  color: #1a7f37;
+}
+
+.pr-reorder-diff-stat-removed .pr-reorder-diff-stat-value {
+  color: #cf222e;
+}
+
+/* Diff List */
+.pr-reorder-diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pr-reorder-diff-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  background-color: #f6f8fa;
+}
+
+.pr-reorder-diff-item-unchanged {
+  border-left-color: #d0d7de;
+  background-color: transparent;
+}
+
+.pr-reorder-diff-item-moved-up {
+  border-left-color: #0969da;
+  background-color: #ddf4ff;
+}
+
+.pr-reorder-diff-item-moved-down {
+  border-left-color: #9a6700;
+  background-color: #fff8c5;
+}
+
+.pr-reorder-diff-item-added {
+  border-left-color: #1a7f37;
+  background-color: #dafbe1;
+}
+
+.pr-reorder-diff-item-removed {
+  border-left-color: #cf222e;
+  background-color: #ffebe9;
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+
+.pr-reorder-diff-file {
+  flex: 1;
+  font-family: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: #24292f;
+}
+
+.pr-reorder-diff-change {
+  font-size: 13px;
+  font-weight: 500;
+  min-width: 100px;
+  text-align: center;
+}
+
+.pr-reorder-diff-item-moved-up .pr-reorder-diff-change {
+  color: #0969da;
+}
+
+.pr-reorder-diff-item-moved-down .pr-reorder-diff-change {
+  color: #9a6700;
+}
+
+.pr-reorder-diff-item-added .pr-reorder-diff-change {
+  color: #1a7f37;
+}
+
+.pr-reorder-diff-item-removed .pr-reorder-diff-change {
+  color: #cf222e;
+}
+
+.pr-reorder-diff-positions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #57606a;
+  font-variant-numeric: tabular-nums;
+}
+
+.pr-reorder-diff-pos-a,
+.pr-reorder-diff-pos-b {
+  min-width: 32px;
+  text-align: center;
+}
+
+.pr-reorder-diff-arrow {
+  color: #d0d7de;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-diff-label-a {
+    background-color: rgba(9, 105, 218, 0.15);
+    color: #79c0ff;
+  }
+
+  .pr-reorder-diff-label-b {
+    background-color: rgba(154, 103, 0, 0.15);
+    color: #f0b72f;
+  }
+
+  .pr-reorder-diff-stats {
+    background-color: #161b22;
+  }
+
+  .pr-reorder-diff-item {
+    background-color: #161b22;
+  }
+
+  .pr-reorder-diff-item-unchanged {
+    background-color: transparent;
+  }
+
+  .pr-reorder-diff-item-moved-up {
+    background-color: rgba(9, 105, 218, 0.15);
+  }
+
+  .pr-reorder-diff-item-moved-down {
+    background-color: rgba(154, 103, 0, 0.15);
+  }
+
+  .pr-reorder-diff-item-added {
+    background-color: rgba(26, 127, 55, 0.15);
+  }
+
+  .pr-reorder-diff-item-removed {
+    background-color: rgba(207, 34, 46, 0.15);
+  }
+
+  .pr-reorder-diff-file {
+    color: #c9d1d9;
+  }
+}
