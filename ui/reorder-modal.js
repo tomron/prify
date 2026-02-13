@@ -116,10 +116,7 @@ export function createReorderModal(options = {}) {
           .filter(Boolean);
 
         updateFileList(fileList, sortedMetadata);
-        showNotification(
-          `Order imported from ${importedData.user}`,
-          'success'
-        );
+        showNotification(`Order imported from ${importedData.user}`, 'success');
       } catch (error) {
         console.error('Failed to import order:', error);
         showNotification(`Import failed: ${error.message}`, 'error');
