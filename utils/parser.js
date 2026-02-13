@@ -55,7 +55,9 @@ export function detectDOMStructureVersion() {
   // Check for known GitHub DOM patterns
   const indicators = {
     hasFiles: !!document.querySelector('.files'),
-    hasDiffContainer: !!document.querySelector('[data-target="diff-container"]'),
+    hasDiffContainer: !!document.querySelector(
+      '[data-target="diff-container"]'
+    ),
     hasProgressiveContainer: !!document.querySelector(
       '.js-diff-progressive-container'
     ),
@@ -164,7 +166,13 @@ export function extractFiles(container) {
     }
 
     // Try multiple selectors for file elements
-    const fileSelectors = ['.file', '[data-file-type]', '[data-path]'];
+    const fileSelectors = [
+      '.file',
+      '[data-file-type]',
+      '[data-path]',
+      '[data-file-path]',
+      '[id^="diff-"]',
+    ];
 
     for (let i = 0; i < fileSelectors.length; i++) {
       const selector = fileSelectors[i];
@@ -173,7 +181,9 @@ export function extractFiles(container) {
         if (i > 0) {
           // Used a fallback selector
           parserStats.fallbacksUsed++;
-          console.log(`[PR-Reorder Parser] Used fallback file selector: ${selector}`);
+          console.log(
+            `[PR-Reorder Parser] Used fallback file selector: ${selector}`
+          );
         }
         parserStats.successfulExtractions++;
         return Array.from(files);
@@ -214,6 +224,20 @@ export function getFilePath(fileElement) {
       return fileElement.dataset.path;
     }
 
+    // Try data-file-path (new GitHub)
+    if (fileElement.dataset && fileElement.dataset.filePath) {
+      return fileElement.dataset.filePath;
+    }
+
+    // Try to extract from ID (diff-{hash}--{path})
+    if (fileElement.id && fileElement.id.startsWith('diff-')) {
+      const pathMatch = fileElement.id.match(/diff-[^-]+--(.*)/);
+      if (pathMatch) {
+        parserStats.fallbacksUsed++;
+        return decodeURIComponent(pathMatch[1]);
+      }
+    }
+
     // Try to find file path in .file-info a element
     const fileInfo = fileElement.querySelector('.file-info a');
     if (fileInfo && fileInfo.textContent) {
@@ -222,10 +246,16 @@ export function getFilePath(fileElement) {
     }
 
     // Try other common selectors
-    const titleElement = fileElement.querySelector('[data-path]');
-    if (titleElement && titleElement.dataset && titleElement.dataset.path) {
-      parserStats.fallbacksUsed++;
-      return titleElement.dataset.path;
+    const titleElement = fileElement.querySelector(
+      '[data-path], [data-file-path]'
+    );
+    if (titleElement) {
+      const path =
+        titleElement.dataset.path || titleElement.dataset.filePath;
+      if (path) {
+        parserStats.fallbacksUsed++;
+        return path;
+      }
     }
 
     // Try the file header link

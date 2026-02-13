@@ -79,7 +79,24 @@ function injectButtons() {
   if (buttonsInjected) return;
 
   // First, check if files have actually loaded
-  const filesExist = document.querySelectorAll('[data-path]').length > 0;
+  // Try multiple selectors as GitHub changes attributes frequently
+  const fileSelectors = [
+    '[data-path]', // Old GitHub
+    '[data-file-path]', // New GitHub
+    '[id^="diff-"]', // Diff containers
+  ];
+
+  let filesExist = false;
+
+  for (const selector of fileSelectors) {
+    const count = document.querySelectorAll(selector).length;
+    if (count > 0) {
+      filesExist = true;
+      console.log(`[PR-Reorder] Found ${count} files using selector: ${selector}`);
+      break;
+    }
+  }
+
   if (!filesExist) {
     console.log('[PR-Reorder] Files not loaded yet, waiting...');
     const manager = getCleanupManager();
