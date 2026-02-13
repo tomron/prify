@@ -119,7 +119,6 @@ export function getFilesContainer(container) {
       '[data-hpc]', // New GitHub (Primer React Components)
       'turbo-frame[id*="repo-content"]', // Turbo frame
       '#diff-comparison-viewer-container', // New GitHub diff viewer
-      'body', // Last resort - search entire page
     ];
 
     for (let i = 0; i < selectors.length; i++) {
@@ -136,6 +135,15 @@ export function getFilesContainer(container) {
         parserStats.successfulExtractions++;
         return element;
       }
+    }
+
+    // Last resort: check if body has file elements
+    const bodyElement = document.querySelector('body');
+    if (bodyElement && bodyElement.querySelector('.file, [data-file-type], [data-path]')) {
+      parserStats.fallbacksUsed++;
+      console.log('[PR-Reorder Parser] Using body as fallback container');
+      parserStats.successfulExtractions++;
+      return bodyElement;
     }
 
     logParserError(
