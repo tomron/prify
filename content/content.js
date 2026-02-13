@@ -9,6 +9,7 @@ import { createOrderViewerModal } from '../ui/order-viewer.js';
 import { saveOrder } from '../utils/storage.js';
 import { getPRId, loadAllOrders, saveOrderEverywhere } from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
+import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
 
 // Extension state
 let extensionLoaded = false;
@@ -18,7 +19,13 @@ let buttonsInjected = false;
  * Initialize extension on GitHub PR pages
  */
 async function init() {
-  if (extensionLoaded) return;
+  // BUG-002: Clean up any previous initialization before reinitializing
+  if (extensionLoaded) {
+    console.log('[PR-Reorder] Cleaning up previous initialization...');
+    cleanup();
+    extensionLoaded = false;
+    buttonsInjected = false;
+  }
 
   // Verify we're on a PR page
   const prId = getPRId();
@@ -52,9 +59,13 @@ function injectButtons() {
   const fileHeader = document.querySelector('.pr-review-tools');
   if (!fileHeader) {
     console.warn('[PR-Reorder] Could not find file header, retrying...');
-    setTimeout(injectButtons, 1000);
+    // BUG-002: Track timeout for cleanup
+    const manager = getCleanupManager();
+    manager.trackTimeout(injectButtons, 1000);
     return;
   }
+
+  const manager = getCleanupManager();
 
   // Create button container
   const container = document.createElement('div');
@@ -66,20 +77,25 @@ function injectButtons() {
   reorderBtn.className = 'btn btn-sm';
   reorderBtn.textContent = '↕️ Reorder Files';
   reorderBtn.title = 'Drag and drop to reorder files';
-  reorderBtn.addEventListener('click', handleReorderClick);
+  // BUG-002: Track event listener
+  manager.trackEventListener(reorderBtn, 'click', handleReorderClick);
 
   // Create View Orders button
   const viewBtn = document.createElement('button');
   viewBtn.className = 'btn btn-sm';
   viewBtn.textContent = '👥 View Orders';
   viewBtn.title = 'View all user orders and consensus';
-  viewBtn.addEventListener('click', handleViewOrdersClick);
+  // BUG-002: Track event listener
+  manager.trackEventListener(viewBtn, 'click', handleViewOrdersClick);
 
   container.appendChild(reorderBtn);
   container.appendChild(viewBtn);
 
   // Inject into UI
   fileHeader.appendChild(container);
+
+  // BUG-002: Track injected element
+  manager.trackElement(container);
 
   buttonsInjected = true;
   console.log('[PR-Reorder] Buttons injected');
@@ -236,30 +252,38 @@ async function main() {
 
 /**
  * Observe for GitHub navigation events
+ * BUG-002: Track observers for proper cleanup
  */
 function observeNavigation() {
-  // GitHub fires these events on navigation
-  document.addEventListener('pjax:end', async () => {
+  const manager = getCleanupManager();
+
+  // Navigation handler
+  const handleNavigation = async () => {
     console.log('[PR-Reorder] Navigation detected, reinitializing...');
-    extensionLoaded = false;
-    buttonsInjected = false;
     await init();
-  });
+  };
+
+  // GitHub fires these events on navigation
+  manager.trackEventListener(document, 'pjax:end', handleNavigation);
 
   // Also watch for URL changes
   let lastUrl = location.href;
-  new MutationObserver(() => {
+  const urlObserver = new MutationObserver(() => {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
       lastUrl = currentUrl;
       console.log(
         '[PR-Reorder] URL changed, checking if reinitialization needed...'
       );
-      extensionLoaded = false;
-      buttonsInjected = false;
-      setTimeout(init, 500);
+      // BUG-002: Track timeout for cleanup
+      manager.trackTimeout(init, 500);
     }
-  }).observe(document.body, { childList: true, subtree: true });
+  });
+
+  urlObserver.observe(document.body, { childList: true, subtree: true });
+
+  // BUG-002: Track observer for cleanup
+  manager.trackObserver(urlObserver);
 }
 
 // Start the extension
