@@ -1354,3 +1354,119 @@
   background-color: #f6f8fa;
   border-color: #d0d7de;
 }
+
+/* === Search and Filter === */
+
+.pr-reorder-modal-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pr-reorder-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d0d7de;
+}
+
+.pr-reorder-search-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pr-reorder-search-input {
+  width: 100%;
+  padding: 6px 32px 6px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #24292f;
+  background-color: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+.pr-reorder-search-input:focus {
+  outline: none;
+  border-color: #0969da;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+}
+
+.pr-reorder-search-input::placeholder {
+  color: #656d76;
+}
+
+.pr-reorder-search-clear {
+  position: absolute;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #656d76;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.pr-reorder-search-clear:hover {
+  color: #24292f;
+}
+
+.pr-reorder-file-count {
+  font-size: 12px;
+  color: #656d76;
+  white-space: nowrap;
+}
+
+/* Search highlighting */
+.pr-reorder-file-path mark {
+  background-color: #fff8c5;
+  color: #24292f;
+  font-weight: 600;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-search-input {
+    color: #c9d1d9;
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+
+  .pr-reorder-search-input::placeholder {
+    color: #8b949e;
+  }
+
+  .pr-reorder-search-input:focus {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+  }
+
+  .pr-reorder-search-clear {
+    color: #8b949e;
+  }
+
+  .pr-reorder-search-clear:hover {
+    color: #c9d1d9;
+  }
+
+  .pr-reorder-file-count {
+    color: #8b949e;
+  }
+
+  .pr-reorder-file-path mark {
+    background-color: #9e6a03;
+    color: #f8e3a1;
+  }
+}

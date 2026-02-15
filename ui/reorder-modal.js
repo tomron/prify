@@ -15,6 +15,11 @@ import {
 } from '../utils/export-import.js';
 import { getPRId, getCurrentUser } from '../content/github-api.js';
 import { showNotification } from '../utils/error-handler.js';
+import {
+  filterFiles,
+  highlightMatches,
+  getFileCountMessage,
+} from '../utils/search-filter.js';
 
 /**
  * Create and show reorder modal
@@ -177,6 +182,9 @@ export function createReorderModal(options = {}) {
     }
   });
 
+  // Setup search functionality
+  setupSearchHandlers(header, fileList, filesMetadata, currentOrder);
+
   // Close on overlay click
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) {
@@ -239,6 +247,9 @@ function createModalHeader() {
   const header = document.createElement('div');
   header.className = 'pr-reorder-modal-header';
 
+  const titleRow = document.createElement('div');
+  titleRow.className = 'pr-reorder-modal-title-row';
+
   const title = document.createElement('h2');
   title.id = 'pr-reorder-modal-title';
   title.className = 'pr-reorder-modal-title';
@@ -255,10 +266,53 @@ function createModalHeader() {
     </svg>
   `;
 
-  header.appendChild(title);
-  header.appendChild(closeBtn);
+  titleRow.appendChild(title);
+  titleRow.appendChild(closeBtn);
+
+  // Create search bar
+  const searchBar = createSearchBar();
+
+  header.appendChild(titleRow);
+  header.appendChild(searchBar);
 
   return header;
+}
+
+/**
+ * Create search bar
+ * @returns {HTMLElement}
+ */
+function createSearchBar() {
+  const searchBar = document.createElement('div');
+  searchBar.className = 'pr-reorder-search-bar';
+
+  const searchContainer = document.createElement('div');
+  searchContainer.className = 'pr-reorder-search-container';
+
+  const searchInput = document.createElement('input');
+  searchInput.type = 'text';
+  searchInput.className = 'pr-reorder-search-input';
+  searchInput.placeholder = 'Search files... (Ctrl+K or /)';
+  searchInput.setAttribute('aria-label', 'Search files');
+  searchInput.dataset.searchInput = 'true';
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'pr-reorder-search-clear';
+  clearBtn.setAttribute('aria-label', 'Clear search');
+  clearBtn.textContent = '×';
+  clearBtn.style.display = 'none';
+
+  const fileCount = document.createElement('div');
+  fileCount.className = 'pr-reorder-file-count';
+  fileCount.dataset.fileCount = 'true';
+
+  searchContainer.appendChild(searchInput);
+  searchContainer.appendChild(clearBtn);
+
+  searchBar.appendChild(searchContainer);
+  searchBar.appendChild(fileCount);
+
+  return searchBar;
 }
 
 /**
@@ -404,7 +458,7 @@ function createFileList(filesMetadata, order) {
  * @param {number} index - Item index
  * @returns {HTMLElement}
  */
-function createFileItem(metadata, index) {
+function createFileItem(metadata, index, search = '') {
   const item = document.createElement('li');
   item.className = 'pr-reorder-file-item';
   item.setAttribute('draggable', 'true');
@@ -426,10 +480,16 @@ function createFileItem(metadata, index) {
     </svg>
   `;
 
-  // File path - SECURITY: Using textContent for user data
+  // File path with optional search highlighting
   const path = document.createElement('span');
   path.className = 'pr-reorder-file-path';
-  path.textContent = metadata.path;
+  if (search) {
+    // SECURITY: highlightMatches already escapes HTML
+    path.innerHTML = highlightMatches(search, metadata.path);
+  } else {
+    // SECURITY: Using textContent for user data
+    path.textContent = metadata.path;
+  }
 
   item.appendChild(handle);
   item.appendChild(path);
@@ -632,7 +692,7 @@ function getOrderFromList(list) {
  * @param {HTMLElement} list - File list element
  * @param {Array<Object>} filesMetadata - Sorted file metadata
  */
-function updateFileList(list, filesMetadata) {
+function updateFileList(list, filesMetadata, search = '') {
   // Create a map of existing items by path for reuse
   const existingItems = new Map();
   Array.from(list.children).forEach((item) => {
@@ -645,17 +705,99 @@ function updateFileList(list, filesMetadata) {
   // Add files in new order
   filesMetadata.forEach((metadata, index) => {
     const existingItem = existingItems.get(metadata.path);
-    if (existingItem) {
-      // Reuse existing item to preserve event listeners
+    if (existingItem && !search) {
+      // Reuse existing item to preserve event listeners (only when not searching)
       existingItem.setAttribute(
         'aria-label',
         `${metadata.path}, position ${index + 1}`
       );
       list.appendChild(existingItem);
     } else {
-      // Create new item if not found
-      const item = createFileItem(metadata, index);
+      // Create new item (or recreate when searching to apply highlighting)
+      const item = createFileItem(metadata, index, search);
       list.appendChild(item);
+    }
+  });
+}
+
+/**
+ * Setup search handlers for filtering files
+ * @param {HTMLElement} header - Modal header containing search bar
+ * @param {HTMLElement} fileList - File list element
+ * @param {Array<Object>} filesMetadata - All files metadata
+ * @param {Array<string>} currentOrder - Current file order
+ */
+function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
+  const searchInput = header.querySelector('[data-search-input]');
+  const clearBtn = header.querySelector('.pr-reorder-search-clear');
+  const fileCount = header.querySelector('[data-file-count]');
+
+  if (!searchInput || !clearBtn || !fileCount) return;
+
+  // Update file count display
+  const updateFileCount = (filtered, total) => {
+    fileCount.textContent = getFileCountMessage(filtered, total);
+  };
+
+  // Initialize file count
+  updateFileCount(filesMetadata.length, filesMetadata.length);
+
+  // Filter and update file list
+  const applyFilter = (search) => {
+
+    if (!search) {
+      // Show all files in current order
+      const sortedMetadata = currentOrder
+        .map((path) => filesMetadata.find((m) => m.path === path))
+        .filter(Boolean);
+      updateFileList(fileList, sortedMetadata);
+      updateFileCount(filesMetadata.length, filesMetadata.length);
+      clearBtn.style.display = 'none';
+      return;
+    }
+
+    // Filter files
+    const filtered = filterFiles(currentOrder, search);
+    const filteredMetadata = filtered
+      .map((path) => filesMetadata.find((m) => m.path === path))
+      .filter(Boolean);
+
+    // Update display
+    updateFileList(fileList, filteredMetadata, search);
+    updateFileCount(filtered.length, filesMetadata.length);
+    clearBtn.style.display = filtered.length === filesMetadata.length ? 'none' : 'block';
+  };
+
+  // Handle search input
+  searchInput.addEventListener('input', (e) => {
+    applyFilter(e.target.value);
+  });
+
+  // Handle clear button
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    applyFilter('');
+    searchInput.focus();
+  });
+
+  // Handle keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+K or / to focus search
+    if ((e.ctrlKey && e.key === 'k') || e.key === '/') {
+      // Prevent default / behavior (quick find)
+      if (e.key === '/') {
+        e.preventDefault();
+      }
+      searchInput.focus();
+      searchInput.select();
+    }
+
+    // Escape to clear search (if search is focused)
+    if (e.key === 'Escape' && document.activeElement === searchInput) {
+      if (searchInput.value) {
+        searchInput.value = '';
+        applyFilter('');
+      }
     }
   });
 }
