@@ -839,6 +839,509 @@ Add loading indicators and success/error feedback.
 
 ---
 
+### Task 1.19: Search/Filter for Large File Lists
+**ID**: `TASK-021-UX`
+**Branch**: `feature/021-search-filter`
+**Priority**: P1 (Critical)
+**Dependencies**: TASK-006 (UI)
+
+**Description:**
+Add search/filter functionality for PRs with 50+ files to improve usability.
+
+**Work Items:**
+1. Add search input to reorder modal header
+2. Implement fuzzy matching for file paths
+3. Add "X of Y files shown" counter
+4. Highlight matching text in file paths
+5. Add clear filter button
+6. Preserve order of filtered files
+7. Add keyboard shortcut (Ctrl+K or /)
+8. Write unit and E2E tests
+
+**Definition of Done:**
+- [ ] Search filters files in real-time
+- [ ] Fuzzy matching works (e.g., "rdme" matches "README.md")
+- [ ] Filtered files maintain relative order
+- [ ] Clear button resets filter
+- [ ] Filter works with keyboard navigation
+- [ ] Search is case-insensitive
+- [ ] E2E tests cover search workflow
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Fuzzy matching algorithm
+- E2E: Search and filter files
+- E2E: Clear filter
+- E2E: Keyboard shortcut (Ctrl+K)
+- E2E: Filter with large file list (100+ files)
+
+---
+
+### Task 1.20: File Preview/Context on Hover
+**ID**: `TASK-022-UX`
+**Branch**: `feature/022-file-preview`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-003 (Parser)
+
+**Description:**
+Show file metadata and context on hover to help users make informed reordering decisions.
+
+**Work Items:**
+1. Create tooltip component
+2. Extract file metadata (size, type, change summary)
+3. Add hover delay (500ms)
+4. Show full file path if truncated
+5. Display file status (new, modified, deleted, renamed)
+6. Add file type icons
+7. Make tooltips accessible (keyboard triggerable)
+8. Write tests
+
+**Definition of Done:**
+- [ ] Tooltip appears after 500ms hover
+- [ ] Shows useful metadata (path, size, changes, type)
+- [ ] Doesn't interfere with dragging
+- [ ] Accessible to keyboard users
+- [ ] Styling matches GitHub's design
+- [ ] E2E tests verify tooltip content
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Tooltip data formatting
+- E2E: Hover shows tooltip
+- E2E: Tooltip doesn't block drag-and-drop
+- E2E: Keyboard accessibility
+
+---
+
+### Task 1.21: Visual File Grouping and Separators
+**ID**: `TASK-023-UX`
+**Branch**: `feature/023-file-grouping`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-003 (Parser)
+
+**Description:**
+Add visual organization to file lists with grouping and separators.
+
+**Work Items:**
+1. Implement separator/divider component
+2. Add manual separator insertion UI
+3. Auto-suggest groups based on:
+   - Directory structure
+   - File extensions
+   - Related files (component + test)
+4. Make groups collapsible
+5. Add group labels
+6. Ensure drag-and-drop works across groups
+7. Persist separators in order data
+8. Write tests
+
+**Definition of Done:**
+- [ ] Users can add/remove separators
+- [ ] Groups are collapsible
+- [ ] Auto-suggestions work
+- [ ] Groups persist in saved order
+- [ ] Visual hierarchy is clear
+- [ ] Drag-and-drop works across groups
+- [ ] E2E tests cover grouping workflow
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Group detection algorithm
+- E2E: Add manual separator
+- E2E: Collapse/expand groups
+- E2E: Drag files between groups
+- E2E: Persist and load groups
+
+---
+
+### Task 1.22: Enhanced Preset Management
+**ID**: `TASK-024-UX`
+**Branch**: `feature/024-preset-management`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-014-UX (Sort Presets)
+
+**Description:**
+Advanced preset management with custom presets and better UX.
+
+**Work Items:**
+1. Add "Save as preset" functionality
+2. Implement custom preset creation UI
+3. Show preset descriptions on hover
+4. Add preset preview before applying
+5. Build preset management modal (edit, delete, reorder)
+6. Mark frequently used presets with star
+7. Enable preset export/import
+8. Write tests
+
+**Definition of Done:**
+- [ ] Users can create custom presets
+- [ ] Presets sync across PRs (localStorage)
+- [ ] Preset management UI is intuitive
+- [ ] Descriptions show on hover
+- [ ] Custom presets can be exported/imported
+- [ ] Star marking works
+- [ ] E2E tests cover preset management
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Preset CRUD operations
+- E2E: Create custom preset
+- E2E: Edit/delete preset
+- E2E: Export/import presets
+- E2E: Star/unstar preset
+
+---
+
+### Task 1.23: Real-Time Collaboration Indicators
+**ID**: `TASK-025-UX`
+**Branch**: `feature/025-collaboration-indicators`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-007 (GitHub Comments), TASK-009 (Order Viewer)
+
+**Description:**
+Show collaboration context in the UI to improve team coordination.
+
+**Work Items:**
+1. Add user count badge ("X people ordered")
+2. Show last update timestamp and user
+3. Display active users (last 5 minutes)
+4. Add quick link to view all orders
+5. Highlight conflicts in real-time
+6. Update indicators when new orders posted
+7. Write tests
+
+**Definition of Done:**
+- [ ] User count is accurate
+- [ ] Last updated shows relative time (2m ago, 1h ago)
+- [ ] Quick link to view orders works
+- [ ] Non-intrusive design
+- [ ] Updates when new orders posted
+- [ ] E2E tests verify indicators
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Time formatting (relative timestamps)
+- E2E: User count updates
+- E2E: Last updated timestamp
+- E2E: Quick link navigation
+
+---
+
+### Task 1.24: Enhanced Drag and Drop Feedback
+**ID**: `TASK-026-UX`
+**Branch**: `feature/026-drag-feedback`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI)
+
+**Description:**
+Improve visual feedback during drag-and-drop operations.
+
+**Work Items:**
+1. Add drop zone indicator line (between items)
+2. Show ghost preview at drop position
+3. Animate smooth transitions on drop
+4. Add visual/haptic feedback on successful drop
+5. Show "Drop here" placeholder text
+6. Highlight valid drop zones
+7. Support reduced motion preferences
+8. Write tests
+
+**Definition of Done:**
+- [ ] Drop position always clear
+- [ ] Animations smooth (60fps)
+- [ ] No jarring transitions
+- [ ] Works on all screen sizes
+- [ ] Respects reduced motion preference
+- [ ] E2E tests verify animations
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Drop zone indicator appears
+- E2E: Ghost preview shows
+- E2E: Smooth drop animation
+- Unit: Reduced motion detection
+
+---
+
+### Task 1.25: Onboarding and First-Time User Experience
+**ID**: `TASK-027-UX`
+**Branch**: `feature/027-onboarding`
+**Priority**: P1 (Critical)
+**Dependencies**: TASK-010 (Content Script)
+
+**Description:**
+Add guided onboarding tour for first-time users.
+
+**Work Items:**
+1. Create tour overlay component
+2. Implement 4-5 step guided tour:
+   - Step 1: Drag files to reorder
+   - Step 2: Use presets for quick sorting
+   - Step 3: Save your order
+   - Step 4: View consensus
+3. Add "Skip tour" and "Next" navigation
+4. Show tour on first use only
+5. Add "What's new" modal for updates
+6. Add "Need help?" button in modal
+7. Store tour completion state
+8. Write tests
+
+**Definition of Done:**
+- [ ] Tour shows on first use only
+- [ ] Tour is skippable
+- [ ] Highlights relevant UI elements
+- [ ] "Never show again" option works
+- [ ] Tour is helpful, not annoying
+- [ ] E2E tests cover tour flow
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: First-time tour appears
+- E2E: Skip tour works
+- E2E: Complete tour
+- E2E: Tour doesn't show on second visit
+- Unit: Tour state persistence
+
+---
+
+### Task 1.26: Accessibility Improvements
+**ID**: `TASK-028-UX`
+**Branch**: `feature/028-accessibility`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-016-UX (Keyboard Shortcuts)
+
+**Description:**
+Comprehensive accessibility improvements to meet WCAG 2.1 AA standards.
+
+**Work Items:**
+1. Add ARIA live regions for dynamic updates
+2. Improve screen reader announcements for drag-and-drop
+3. Ensure full keyboard navigation
+4. Test with screen readers (NVDA, JAWS)
+5. Add skip links in modals
+6. Ensure color contrast meets WCAG AA
+7. Support Windows High Contrast mode
+8. Add reduced motion preferences
+9. Improve focus indicators visibility
+10. Write accessibility tests
+
+**Definition of Done:**
+- [ ] Passes WCAG 2.1 AA standards
+- [ ] Works with NVDA and JAWS
+- [ ] Full keyboard navigation functional
+- [ ] Color contrast ratios meet standards
+- [ ] Reduced motion preference respected
+- [ ] Screen reader announcements clear
+- [ ] Focus trap in modals works correctly
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Keyboard-only navigation
+- E2E: Screen reader testing (manual)
+- Unit: Color contrast validation
+- E2E: Reduced motion mode
+- Integration: ARIA live region updates
+
+---
+
+### Task 1.27: Dark Mode Refinements
+**ID**: `TASK-029-UX`
+**Branch**: `feature/029-dark-mode-refinements`
+**Priority**: P3 (Nice to have)
+**Dependencies**: TASK-006 (UI)
+
+**Description:**
+Polish dark mode to match GitHub's dark theme perfectly.
+
+**Work Items:**
+1. Audit all colors against GitHub's dark theme
+2. Ensure consistent contrast ratios
+3. Fix light mode artifacts in dark mode
+4. Test all UI states (hover, active, disabled)
+5. Add custom dark mode toggle if detection fails
+6. Test toast notifications in dark mode
+7. Verify loading overlays
+8. Write visual regression tests
+
+**Definition of Done:**
+- [ ] All UI elements have proper contrast
+- [ ] No light mode artifacts
+- [ ] Consistent with GitHub's dark theme
+- [ ] Tested in both light and dark modes
+- [ ] Smooth mode switching
+- [ ] Visual regression tests pass
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Dark mode switching
+- Visual: Screenshot comparison tests
+- Unit: Color contrast calculations
+- Manual: Visual approval in both modes
+
+---
+
+### Task 1.28: Bulk Selection and Operations
+**ID**: `TASK-030-UX`
+**Branch**: `feature/030-bulk-operations`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI)
+
+**Description:**
+Enable bulk file operations for efficient reordering of multiple files.
+
+**Work Items:**
+1. Add checkbox selection mode toggle
+2. Implement Shift+Click range selection
+3. Add "Select all" and "Select none" buttons
+4. Create bulk operations menu:
+   - Move to top/bottom
+   - Group together
+   - Apply preset to selected only
+   - Remove from view (filter)
+5. Update drag-and-drop to work with selections
+6. Add keyboard shortcuts for selection
+7. Write tests
+
+**Definition of Done:**
+- [ ] Selection works with mouse and keyboard
+- [ ] Shift+Click selects range
+- [ ] All bulk operations work correctly
+- [ ] Visual feedback for selected files
+- [ ] Easy to enter/exit selection mode
+- [ ] E2E tests cover bulk workflows
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- E2E: Checkbox selection
+- E2E: Shift+Click range selection
+- E2E: Bulk move to top
+- E2E: Bulk group together
+- E2E: Select all/none
+
+---
+
+### Task 1.29: Workspace and Multi-PR Management
+**ID**: `TASK-031-UX`
+**Branch**: `feature/031-workspace-management`
+**Priority**: P3 (Nice to have)
+**Dependencies**: TASK-004 (Storage), TASK-024-UX (Preset Management)
+
+**Description:**
+Manage ordering preferences across multiple PRs and repositories.
+
+**Work Items:**
+1. Implement repository-specific workspace settings
+2. Add "Apply order from PR #X" functionality
+3. Save ordering templates per repository
+4. Add recent orders list
+5. Quick preset switching between PRs
+6. Workspace settings sync via chrome.storage.sync
+7. Write tests
+
+**Definition of Done:**
+- [ ] Presets are repository-specific
+- [ ] Easy to import from other PRs
+- [ ] Workspace settings sync across Chrome instances
+- [ ] Non-intrusive UX
+- [ ] Clear organization
+- [ ] E2E tests cover workspace features
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Workspace data structure
+- E2E: Save workspace preset
+- E2E: Import order from another PR
+- E2E: Settings sync (multi-device simulation)
+
+---
+
+### Task 1.30: Virtual Scrolling for Large PRs
+**ID**: `TASK-032-UX`
+**Branch**: `feature/032-virtual-scrolling`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-006 (UI), TASK-012 (Performance)
+
+**Description:**
+Implement virtual scrolling for PRs with 200+ files to improve performance.
+
+**Work Items:**
+1. Implement virtual list component
+2. Use Intersection Observer API
+3. Render viewport + buffer (20 items)
+4. Maintain scroll position on reorder
+5. Ensure drag-and-drop works with virtual list
+6. Add pagination option for 500+ files
+7. Optimize re-renders
+8. Write performance tests
+
+**Definition of Done:**
+- [ ] Smooth scrolling with 500+ files
+- [ ] No lag during drag-and-drop
+- [ ] Memory usage stays reasonable (<50MB)
+- [ ] Works with search/filter
+- [ ] Maintains accessibility
+- [ ] Performance benchmarks pass
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Benchmark: Render time for 500 files
+- Benchmark: Memory usage
+- E2E: Scroll through large list
+- E2E: Drag-and-drop in virtual list
+- E2E: Search with virtual scrolling
+
+---
+
+### Task 1.31: Enhanced Order Comparison
+**ID**: `TASK-033-UX`
+**Branch**: `feature/033-order-comparison`
+**Priority**: P2 (Important)
+**Dependencies**: TASK-018-UX (Order Diff)
+
+**Description:**
+Enhanced order comparison with side-by-side view and similarity scoring.
+
+**Work Items:**
+1. Implement side-by-side comparison view
+2. Calculate and display similarity score
+3. Highlight major position changes (>10 positions)
+4. Show file movement arrows in list
+5. Add "Accept this file's position" per-file button
+6. Add "Compare with..." dropdown to select orders
+7. Show visual indicators for movement direction
+8. Write tests
+
+**Definition of Done:**
+- [ ] Side-by-side view is clear
+- [ ] Movement indicators are intuitive
+- [ ] Similarity score is accurate (0-100%)
+- [ ] Easy to merge changes
+- [ ] Works with keyboard navigation
+- [ ] E2E tests verify comparison features
+- [ ] PR created and reviewed
+- [ ] Branch/worktree cleaned up
+
+**Tests Required:**
+- Unit: Similarity score algorithm
+- E2E: Side-by-side comparison
+- E2E: Accept file position
+- E2E: Compare different orders
+- Unit: Movement detection (up/down/unchanged)
+
+---
+
 ## Phase 2: Smart Defaults
 
 ### Task 2.1: Dependency Graph Parser
