@@ -17,7 +17,7 @@ export function calculateOrderDiff(orderA, orderB) {
       moved: [],
       addedInB: [],
       removedFromB: [],
-      similarityScore: 100
+      similarityScore: 100,
     };
   }
 
@@ -27,7 +27,7 @@ export function calculateOrderDiff(orderA, orderB) {
       moved: [],
       addedInB: [...orderB],
       removedFromB: [],
-      similarityScore: 0
+      similarityScore: 0,
     };
   }
 
@@ -37,7 +37,7 @@ export function calculateOrderDiff(orderA, orderB) {
       moved: [],
       addedInB: [],
       removedFromB: [...orderA],
-      similarityScore: 0
+      similarityScore: 0,
     };
   }
 
@@ -46,15 +46,15 @@ export function calculateOrderDiff(orderA, orderB) {
   const orderBMap = new Map(orderB.map((file, index) => [file, index]));
 
   // Find files in both orders
-  const commonFiles = orderA.filter(file => orderBMap.has(file));
-  const addedInB = orderB.filter(file => !orderAMap.has(file));
-  const removedFromB = orderA.filter(file => !orderBMap.has(file));
+  const commonFiles = orderA.filter((file) => orderBMap.has(file));
+  const addedInB = orderB.filter((file) => !orderAMap.has(file));
+  const removedFromB = orderA.filter((file) => !orderBMap.has(file));
 
   // Separate unchanged and moved files
   const unchanged = [];
   const moved = [];
 
-  commonFiles.forEach(file => {
+  commonFiles.forEach((file) => {
     const fromIndex = orderAMap.get(file);
     const toIndex = orderBMap.get(file);
     const distance = toIndex - fromIndex;
@@ -71,20 +71,26 @@ export function calculateOrderDiff(orderA, orderB) {
         toIndex,
         direction,
         distance,
-        isLargeMove
+        isLargeMove,
       });
     }
   });
 
   // Calculate similarity score (0-100)
-  const similarityScore = calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap);
+  const similarityScore = calculateSimilarity(
+    orderA,
+    orderB,
+    commonFiles,
+    orderAMap,
+    orderBMap
+  );
 
   return {
     unchanged,
     moved,
     addedInB,
     removedFromB,
-    similarityScore
+    similarityScore,
   };
 }
 
@@ -98,7 +104,13 @@ export function calculateOrderDiff(orderA, orderB) {
  * @param {Map} orderBMap
  * @returns {number} Similarity score from 0-100
  */
-function calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap) {
+function calculateSimilarity(
+  orderA,
+  orderB,
+  commonFiles,
+  orderAMap,
+  orderBMap
+) {
   if (commonFiles.length === 0) {
     return 0;
   }
@@ -107,7 +119,7 @@ function calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap) 
   let totalDistance = 0;
   const maxPossibleDistance = Math.max(orderA.length, orderB.length);
 
-  commonFiles.forEach(file => {
+  commonFiles.forEach((file) => {
     const posA = orderAMap.get(file);
     const posB = orderBMap.get(file);
     totalDistance += Math.abs(posB - posA);
@@ -116,7 +128,10 @@ function calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap) 
   // Normalize: 0 distance = 100% similar, max distance = 0% similar
   const avgDistance = totalDistance / commonFiles.length;
   const normalizedDistance = avgDistance / maxPossibleDistance;
-  const similarity = Math.max(0, Math.min(100, Math.round((1 - normalizedDistance) * 100)));
+  const similarity = Math.max(
+    0,
+    Math.min(100, Math.round((1 - normalizedDistance) * 100))
+  );
 
   return similarity;
 }

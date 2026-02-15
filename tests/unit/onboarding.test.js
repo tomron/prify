@@ -98,8 +98,10 @@ describe('markTourComplete', () => {
     const before = Date.now();
     await markTourComplete();
     const after = Date.now();
-    
-    const stored = JSON.parse(global.localStorage.getItem('pr-reorder-tour-complete'));
+
+    const stored = JSON.parse(
+      global.localStorage.getItem('pr-reorder-tour-complete')
+    );
     expect(stored.timestamp).toBeGreaterThanOrEqual(before);
     expect(stored.timestamp).toBeLessThanOrEqual(after);
   });

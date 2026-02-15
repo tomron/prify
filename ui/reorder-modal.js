@@ -644,7 +644,6 @@ function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
 
   // Filter and update file list
   const applyFilter = (search) => {
-
     if (!search) {
       // Show all files in current order
       const sortedMetadata = currentOrder
@@ -665,7 +664,8 @@ function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
     // Update display
     updateFileList(fileList, filteredMetadata, search);
     updateFileCount(filtered.length, filesMetadata.length);
-    clearBtn.style.display = filtered.length === filesMetadata.length ? 'none' : 'block';
+    clearBtn.style.display =
+      filtered.length === filesMetadata.length ? 'none' : 'block';
   };
 
   // Handle search input

@@ -59,7 +59,8 @@ export function createOnboardingTour(options = {}) {
     // Skip button (only show on first steps)
     if (currentStep < steps.length - 1) {
       const skipBtn = document.createElement('button');
-      skipBtn.className = 'pr-reorder-btn pr-reorder-btn-tertiary pr-tour-skip-btn';
+      skipBtn.className =
+        'pr-reorder-btn pr-reorder-btn-tertiary pr-tour-skip-btn';
       skipBtn.textContent = 'Skip Tour';
       skipBtn.addEventListener('click', handleSkip);
       footer.appendChild(skipBtn);
