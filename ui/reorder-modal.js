@@ -8,14 +8,6 @@ import { extractAllFilesMetadata } from '../utils/parser.js';
 import { getAllPresets, applyPreset } from '../utils/presets.js';
 import { savePreference, loadPreference } from '../utils/storage.js';
 import {
-  downloadOrderAsJSON,
-  importOrderFromJSON,
-  generateShareableURL,
-  copyToClipboard,
-} from '../utils/export-import.js';
-import { getPRId, getCurrentUser } from '../content/github-api.js';
-import { showNotification } from '../utils/error-handler.js';
-import {
   filterFiles,
   highlightMatches,
   getFileCountMessage,
@@ -72,9 +64,6 @@ export function createReorderModal(options = {}) {
   const closeBtn = header.querySelector('.pr-reorder-modal-close');
   const cancelBtn = footer.querySelector('[data-action="cancel"]');
   const saveBtn = footer.querySelector('[data-action="save"]');
-  const exportBtn = footer.querySelector('[data-action="export"]');
-  const importBtn = footer.querySelector('[data-action="import"]');
-  const shareBtn = footer.querySelector('[data-action="share"]');
   const presetSelect = presetBar.querySelector('.pr-reorder-preset-select');
 
   const close = () => {
@@ -88,70 +77,9 @@ export function createReorderModal(options = {}) {
     if (onSave) onSave(newOrder);
   };
 
-  const handleExport = () => {
-    try {
-      const order = getOrderFromList(fileList);
-      const prId = getPRId();
-      const user = getCurrentUser();
-      downloadOrderAsJSON(order, prId, user);
-      showNotification('Order exported successfully', 'success');
-    } catch (error) {
-      console.error('Failed to export order:', error);
-      showNotification('Failed to export order', 'error');
-    }
-  };
-
-  const handleImport = () => {
-    // Create file input
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'application/json';
-
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      try {
-        const text = await file.text();
-        const importedData = importOrderFromJSON(text);
-
-        // Update file list with imported order
-        const sortedMetadata = importedData.order
-          .map((path) => filesMetadata.find((m) => m.path === path))
-          .filter(Boolean);
-
-        updateFileList(fileList, sortedMetadata);
-        showNotification(`Order imported from ${importedData.user}`, 'success');
-      } catch (error) {
-        console.error('Failed to import order:', error);
-        showNotification(`Import failed: ${error.message}`, 'error');
-      }
-    });
-
-    fileInput.click();
-  };
-
-  const handleShare = async () => {
-    try {
-      const order = getOrderFromList(fileList);
-      const prId = getPRId();
-      const user = getCurrentUser();
-      const url = generateShareableURL(order, prId, user);
-
-      await copyToClipboard(url);
-      showNotification('Shareable URL copied to clipboard', 'success');
-    } catch (error) {
-      console.error('Failed to generate shareable URL:', error);
-      showNotification('Failed to generate shareable URL', 'error');
-    }
-  };
-
   closeBtn.addEventListener('click', close);
   cancelBtn.addEventListener('click', close);
   saveBtn.addEventListener('click', save);
-  exportBtn.addEventListener('click', handleExport);
-  importBtn.addEventListener('click', handleImport);
-  shareBtn.addEventListener('click', handleShare);
 
   // Handle preset selection
   presetSelect.addEventListener('change', async (e) => {
@@ -372,37 +300,10 @@ function createModalFooter() {
   const footer = document.createElement('div');
   footer.className = 'pr-reorder-modal-footer';
 
-  // Left side: Export/Import buttons
-  const leftActions = document.createElement('div');
-  leftActions.className = 'pr-reorder-footer-left';
-  leftActions.style.cssText = 'display: flex; gap: 8px;';
-
-  const exportBtn = document.createElement('button');
-  exportBtn.className = 'pr-reorder-btn pr-reorder-btn-secondary';
-  exportBtn.textContent = '📥 Export';
-  exportBtn.title = 'Export order as JSON file';
-  exportBtn.setAttribute('data-action', 'export');
-
-  const importBtn = document.createElement('button');
-  importBtn.className = 'pr-reorder-btn pr-reorder-btn-secondary';
-  importBtn.textContent = '📤 Import';
-  importBtn.title = 'Import order from JSON file';
-  importBtn.setAttribute('data-action', 'import');
-
-  const shareBtn = document.createElement('button');
-  shareBtn.className = 'pr-reorder-btn pr-reorder-btn-secondary';
-  shareBtn.textContent = '🔗 Share';
-  shareBtn.title = 'Generate shareable URL';
-  shareBtn.setAttribute('data-action', 'share');
-
-  leftActions.appendChild(exportBtn);
-  leftActions.appendChild(importBtn);
-  leftActions.appendChild(shareBtn);
-
-  // Right side: Cancel/Save buttons
-  const rightActions = document.createElement('div');
-  rightActions.className = 'pr-reorder-footer-right';
-  rightActions.style.cssText = 'display: flex; gap: 8px; margin-left: auto;';
+  // Only Cancel/Save buttons (removed Export/Import/Share)
+  const actions = document.createElement('div');
+  actions.className = 'pr-reorder-footer-right';
+  actions.style.cssText = 'display: flex; gap: 8px; margin-left: auto;';
 
   const cancelBtn = document.createElement('button');
   cancelBtn.className = 'pr-reorder-btn pr-reorder-btn-secondary';
@@ -414,11 +315,10 @@ function createModalFooter() {
   saveBtn.textContent = 'Save & Apply';
   saveBtn.setAttribute('data-action', 'save');
 
-  rightActions.appendChild(cancelBtn);
-  rightActions.appendChild(saveBtn);
+  actions.appendChild(cancelBtn);
+  actions.appendChild(saveBtn);
 
-  footer.appendChild(leftActions);
-  footer.appendChild(rightActions);
+  footer.appendChild(actions);
 
   return footer;
 }
