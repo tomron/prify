@@ -798,28 +798,29 @@
 .pr-reorder-viewer-body {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-8); /* Increased spacing between sections */
 }
 
 .pr-viewer-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-4);
 }
 
 .pr-viewer-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #d0d7de;
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--color-border-default);
 }
 
 .pr-viewer-section-title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
   margin: 0;
-  color: #24292f;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
 .pr-viewer-subsection-title {
@@ -965,35 +966,99 @@
 .pr-viewer-order-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid #d0d7de;
-  border-radius: 8px;
-  background-color: #ffffff;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  position: relative;
+}
+
+.pr-viewer-order-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-400);
+  transform: translateY(-1px);
+}
+
+/* Accent bar on left for visual interest */
+.pr-viewer-order-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--space-4);
+  bottom: var(--space-4);
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--blue-500),
+    var(--purple-500)
+  );
+  border-radius: var(--radius-full);
 }
 
 .pr-viewer-order-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .pr-viewer-order-user {
-  font-weight: 600;
-  color: #24292f;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Add avatar placeholder for visual interest */
+.pr-viewer-order-user::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--blue-400), var(--purple-400));
+  flex-shrink: 0;
 }
 
 .pr-viewer-order-timestamp {
-  font-size: 12px;
-  color: #57606a;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
 }
 
 .pr-viewer-order-files {
-  background-color: #f6f8fa;
-  padding: 8px;
-  border-radius: 6px;
+  background-color: var(--color-bg-tertiary);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
   max-height: 200px;
   overflow-y: auto;
+  border: 1px solid var(--color-border-subtle);
+}
+
+/* Custom scrollbar for order files list */
+.pr-viewer-order-files::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pr-viewer-order-files::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pr-viewer-order-files::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: var(--radius-full);
+}
+
+.pr-viewer-order-files::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
 }
 
 .pr-viewer-apply-btn {
@@ -1035,12 +1100,21 @@
   }
 
   .pr-viewer-order-card {
-    background-color: #0d1117;
-    border-color: #30363d;
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-border-default);
+  }
+
+  .pr-viewer-order-card:hover {
+    border-color: var(--gray-400);
   }
 
   .pr-viewer-order-user {
-    color: #c9d1d9;
+    color: var(--color-text-primary);
+  }
+
+  .pr-viewer-order-files {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-border-subtle);
   }
 
   .pr-viewer-conflicts-list {
@@ -1514,8 +1588,14 @@
 
 .pr-viewer-card-buttons {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.pr-viewer-card-buttons .pr-reorder-btn {
+  flex: 1; /* Equal width buttons */
+  justify-content: center;
 }
 
 .pr-viewer-compare-btn {
@@ -1972,6 +2052,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-6);
+  padding-left: var(--space-8); /* Indent to align with modal body content */
   border-bottom: 1px solid var(--color-border-subtle);
   background: var(--color-bg-secondary);
   position: relative;
@@ -1983,6 +2064,7 @@
   font-weight: var(--font-medium);
   color: var(--color-text-secondary);
   flex-shrink: 0;
+  margin-left: var(--space-1); /* Slight additional indent for visual alignment */
 }
 
 .pr-reorder-preset-select {
