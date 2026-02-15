@@ -1,0 +1,637 @@
+/**
+ * PR File Reorder Extension - Design System
+ *
+ * Centralized design tokens and utility classes for consistent UI/UX
+ * Based on GitHub's design language with custom enhancements
+ *
+ * Last updated: 2026-02-15
+ */
+
+/* ============================================================================
+   DESIGN TOKENS
+   ============================================================================ */
+
+:root {
+  /* === Spacing Scale (8px grid system) === */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* === Typography Scale === */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 20px;
+  --text-3xl: 24px;
+  --text-4xl: 30px;
+  --text-5xl: 36px;
+
+  /* === Font Weights === */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* === Line Heights === */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* === Font Families === */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans',
+    Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  /* === Border Radius === */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadows === */
+  --shadow-xs: 0 1px 2px rgba(27, 31, 36, 0.04);
+  --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.08);
+  --shadow-md: 0 4px 8px rgba(27, 31, 36, 0.12);
+  --shadow-lg: 0 8px 16px rgba(27, 31, 36, 0.15);
+  --shadow-xl: 0 16px 32px rgba(27, 31, 36, 0.18);
+  --shadow-2xl: 0 24px 48px rgba(27, 31, 36, 0.22);
+
+  /* Focus shadow */
+  --shadow-focus: 0 0 0 3px rgba(9, 105, 218, 0.15);
+  --shadow-focus-dark: 0 0 0 3px rgba(88, 166, 255, 0.15);
+
+  /* === Z-Index Scale === */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-fixed: 1200;
+  --z-modal-backdrop: 9999;
+  --z-modal: 10000;
+  --z-popover: 10001;
+  --z-toast: 10002;
+  --z-tour: 999999;
+
+  /* === Transitions === */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Easing curves */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+
+  /* === Color Palette (GitHub-based) === */
+
+  /* Grays */
+  --gray-0: #ffffff;
+  --gray-50: #fafbfc;
+  --gray-100: #f6f8fa;
+  --gray-200: #eaeef2;
+  --gray-300: #d0d7de;
+  --gray-400: #afb8c1;
+  --gray-500: #8c959f;
+  --gray-600: #6e7781;
+  --gray-700: #57606a;
+  --gray-800: #424a53;
+  --gray-900: #32383f;
+  --gray-950: #24292f;
+
+  /* Primary (Blue) */
+  --blue-50: #ddf4ff;
+  --blue-100: #b6e3ff;
+  --blue-200: #80ccff;
+  --blue-300: #54aeff;
+  --blue-400: #218bff;
+  --blue-500: #0969da;
+  --blue-600: #0550ae;
+  --blue-700: #033d8b;
+  --blue-800: #0a3069;
+  --blue-900: #002155;
+
+  /* Success (Green) */
+  --green-50: #dafbe1;
+  --green-100: #aceebb;
+  --green-200: #6fdd8b;
+  --green-300: #4ac26b;
+  --green-400: #2da44e;
+  --green-500: #1a7f37;
+  --green-600: #116329;
+  --green-700: #044f1e;
+  --green-800: #003d16;
+  --green-900: #002d11;
+
+  /* Warning (Yellow) */
+  --yellow-50: #fff8c5;
+  --yellow-100: #fae17d;
+  --yellow-200: #eac54f;
+  --yellow-300: #d4a72c;
+  --yellow-400: #bf8700;
+  --yellow-500: #9a6700;
+  --yellow-600: #7d4e00;
+  --yellow-700: #633c01;
+  --yellow-800: #4d2d00;
+  --yellow-900: #3b2300;
+
+  /* Danger (Red) */
+  --red-50: #ffebe9;
+  --red-100: #ffcecb;
+  --red-200: #ffaba8;
+  --red-300: #ff8182;
+  --red-400: #fa4549;
+  --red-500: #cf222e;
+  --red-600: #a40e26;
+  --red-700: #82071e;
+  --red-800: #660018;
+  --red-900: #4c0014;
+
+  /* Accent (Purple) */
+  --purple-50: #fbefff;
+  --purple-100: #ecd8ff;
+  --purple-200: #d8b9ff;
+  --purple-300: #c297ff;
+  --purple-400: #a475f9;
+  --purple-500: #8250df;
+  --purple-600: #6639ba;
+  --purple-700: #512a97;
+  --purple-800: #3e1f79;
+  --purple-900: #2e1461;
+
+  /* === Semantic Colors === */
+  --color-text-primary: var(--gray-950);
+  --color-text-secondary: var(--gray-700);
+  --color-text-tertiary: var(--gray-600);
+  --color-text-placeholder: var(--gray-500);
+  --color-text-disabled: var(--gray-400);
+  --color-text-inverse: var(--gray-0);
+  --color-text-link: var(--blue-500);
+  --color-text-success: var(--green-500);
+  --color-text-warning: var(--yellow-500);
+  --color-text-danger: var(--red-500);
+
+  --color-bg-primary: var(--gray-0);
+  --color-bg-secondary: var(--gray-50);
+  --color-bg-tertiary: var(--gray-100);
+  --color-bg-overlay: rgba(27, 31, 36, 0.5);
+  --color-bg-backdrop: rgba(27, 31, 36, 0.7);
+
+  --color-border-default: var(--gray-300);
+  --color-border-subtle: var(--gray-200);
+  --color-border-muted: var(--gray-100);
+
+  --color-focus: var(--blue-500);
+  --color-success: var(--green-500);
+  --color-warning: var(--yellow-500);
+  --color-danger: var(--red-500);
+  --color-info: var(--blue-500);
+}
+
+/* === Dark Mode Overrides === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Invert gray scale */
+    --gray-0: #0d1117;
+    --gray-50: #161b22;
+    --gray-100: #21262d;
+    --gray-200: #30363d;
+    --gray-300: #484f58;
+    --gray-400: #6e7781;
+    --gray-500: #8b949e;
+    --gray-600: #afb8c1;
+    --gray-700: #c9d1d9;
+    --gray-800: #d0d7de;
+    --gray-900: #e6edf3;
+    --gray-950: #f0f6fc;
+
+    /* Adjust primary colors for dark mode */
+    --blue-500: #58a6ff;
+    --green-500: #3fb950;
+    --yellow-500: #d29922;
+    --red-500: #f85149;
+    --purple-500: #a371f7;
+
+    /* Semantic color updates */
+    --color-text-primary: var(--gray-950);
+    --color-text-secondary: var(--gray-700);
+    --color-text-tertiary: var(--gray-600);
+    --color-text-link: var(--blue-500);
+
+    --color-bg-primary: var(--gray-0);
+    --color-bg-secondary: var(--gray-50);
+    --color-bg-tertiary: var(--gray-100);
+    --color-bg-overlay: rgba(1, 4, 9, 0.6);
+    --color-bg-backdrop: rgba(1, 4, 9, 0.8);
+
+    --color-border-default: var(--gray-200);
+    --color-border-subtle: var(--gray-100);
+
+    /* Adjust shadows for dark mode */
+    --shadow-xs: 0 0 transparent;
+    --shadow-sm: 0 0 transparent;
+    --shadow-md: 0 6px 12px rgba(1, 4, 9, 0.4);
+    --shadow-lg: 0 12px 24px rgba(1, 4, 9, 0.5);
+    --shadow-xl: 0 20px 40px rgba(1, 4, 9, 0.6);
+    --shadow-2xl: 0 30px 60px rgba(1, 4, 9, 0.7);
+
+    --shadow-focus: 0 0 0 3px rgba(88, 166, 255, 0.2);
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* === Spacing Utilities === */
+.pr-m-0 {
+  margin: var(--space-0);
+}
+.pr-m-1 {
+  margin: var(--space-1);
+}
+.pr-m-2 {
+  margin: var(--space-2);
+}
+.pr-m-3 {
+  margin: var(--space-3);
+}
+.pr-m-4 {
+  margin: var(--space-4);
+}
+.pr-m-6 {
+  margin: var(--space-6);
+}
+.pr-m-8 {
+  margin: var(--space-8);
+}
+
+.pr-p-0 {
+  padding: var(--space-0);
+}
+.pr-p-1 {
+  padding: var(--space-1);
+}
+.pr-p-2 {
+  padding: var(--space-2);
+}
+.pr-p-3 {
+  padding: var(--space-3);
+}
+.pr-p-4 {
+  padding: var(--space-4);
+}
+.pr-p-6 {
+  padding: var(--space-6);
+}
+.pr-p-8 {
+  padding: var(--space-8);
+}
+
+/* === Typography Utilities === */
+.pr-text-xs {
+  font-size: var(--text-xs);
+}
+.pr-text-sm {
+  font-size: var(--text-sm);
+}
+.pr-text-base {
+  font-size: var(--text-base);
+}
+.pr-text-lg {
+  font-size: var(--text-lg);
+}
+.pr-text-xl {
+  font-size: var(--text-xl);
+}
+
+.pr-font-normal {
+  font-weight: var(--font-normal);
+}
+.pr-font-medium {
+  font-weight: var(--font-medium);
+}
+.pr-font-semibold {
+  font-weight: var(--font-semibold);
+}
+.pr-font-bold {
+  font-weight: var(--font-bold);
+}
+
+/* === Color Utilities === */
+.pr-text-primary {
+  color: var(--color-text-primary);
+}
+.pr-text-secondary {
+  color: var(--color-text-secondary);
+}
+.pr-text-success {
+  color: var(--color-text-success);
+}
+.pr-text-warning {
+  color: var(--color-text-warning);
+}
+.pr-text-danger {
+  color: var(--color-text-danger);
+}
+
+.pr-bg-primary {
+  background-color: var(--color-bg-primary);
+}
+.pr-bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+.pr-bg-tertiary {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* === Shadow Utilities === */
+.pr-shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+.pr-shadow-md {
+  box-shadow: var(--shadow-md);
+}
+.pr-shadow-lg {
+  box-shadow: var(--shadow-lg);
+}
+.pr-shadow-xl {
+  box-shadow: var(--shadow-xl);
+}
+
+/* === Border Radius Utilities === */
+.pr-rounded-sm {
+  border-radius: var(--radius-sm);
+}
+.pr-rounded-md {
+  border-radius: var(--radius-md);
+}
+.pr-rounded-lg {
+  border-radius: var(--radius-lg);
+}
+.pr-rounded-full {
+  border-radius: var(--radius-full);
+}
+
+/* === Animation Utilities === */
+.pr-transition-fast {
+  transition: all var(--transition-fast);
+}
+.pr-transition-base {
+  transition: all var(--transition-base);
+}
+.pr-transition-slow {
+  transition: all var(--transition-slow);
+}
+
+/* === Interaction States === */
+.pr-interactive {
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.pr-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.pr-interactive:active {
+  transform: scale(0.98);
+}
+
+/* === Focus Styles === */
+.pr-focus-ring:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pr-focus-ring-inset:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-focus);
+}
+
+/* Only show focus ring for keyboard navigation */
+.pr-focus-ring:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================================================================
+   COMPONENT PATTERNS
+   ============================================================================ */
+
+/* === Micro-interactions === */
+
+/* Ripple effect */
+.pr-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.pr-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  pointer-events: none;
+}
+
+.pr-ripple:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Pulse animation */
+@keyframes pr-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pr-pulse {
+  animation: pr-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer loading effect */
+@keyframes pr-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.pr-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gray-200) 0%,
+    var(--gray-100) 50%,
+    var(--gray-200) 100%
+  );
+  background-size: 200% 100%;
+  animation: pr-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Bounce animation */
+@keyframes pr-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pr-bounce {
+  animation: pr-bounce 1s ease-in-out infinite;
+}
+
+/* Fade in */
+@keyframes pr-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pr-fade-in {
+  animation: pr-fade-in var(--transition-base) var(--ease-out);
+}
+
+/* Slide up */
+@keyframes pr-slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pr-slide-up {
+  animation: pr-slide-up var(--transition-slow) var(--ease-out);
+}
+
+/* Scale in */
+@keyframes pr-scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pr-scale-in {
+  animation: pr-scale-in var(--transition-base) var(--ease-out);
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+/* Screen reader only */
+.pr-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to content link */
+.pr-skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-link);
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-fixed);
+}
+
+.pr-skip-link:focus {
+  top: var(--space-4);
+  left: var(--space-4);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border-default: currentColor;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+
+  .pr-reorder-btn {
+    border-width: 2px;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  .pr-reorder-modal-overlay,
+  .pr-reorder-toast,
+  .pr-tour-overlay {
+    display: none !important;
+  }
+}
