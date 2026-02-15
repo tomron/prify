@@ -1,173 +1,146 @@
 /**
- * Unit tests for order diff utilities
+ * Tests for order diff calculation algorithm
  */
 
 import { describe, it, expect } from '@jest/globals';
-import {
-  calculateOrderDiff,
-  getPositionChange,
-  categorizeChange,
-  formatPositionChange,
-} from '../../utils/order-diff.js';
+import { calculateOrderDiff, formatPositionChange } from '../../utils/order-diff.js';
 
-describe('Order Diff Utilities', () => {
-  describe('calculateOrderDiff', () => {
-    it('should calculate diff for identical orders', () => {
-      const orderA = ['a.js', 'b.js', 'c.js'];
-      const orderB = ['a.js', 'b.js', 'c.js'];
+describe('calculateOrderDiff', () => {
+  it('returns empty diff for identical orders', () => {
+    const orderA = ['a.js', 'b.js', 'c.js'];
+    const orderB = ['a.js', 'b.js', 'c.js'];
 
-      const diff = calculateOrderDiff(orderA, orderB);
+    const diff = calculateOrderDiff(orderA, orderB);
 
-      expect(diff.length).toBe(3);
-      expect(diff[0]).toEqual({
-        file: 'a.js',
-        fromIndex: 0,
-        toIndex: 0,
-        change: 0,
-        category: 'unchanged',
-      });
+    expect(diff.unchanged.length).toBe(3);
+    expect(diff.moved.length).toBe(0);
+    expect(diff.addedInB.length).toBe(0);
+    expect(diff.removedFromB.length).toBe(0);
+  });
+
+  it('detects files that moved positions', () => {
+    const orderA = ['a.js', 'b.js', 'c.js'];
+    const orderB = ['b.js', 'a.js', 'c.js']; // a and b swapped
+
+    const diff = calculateOrderDiff(orderA, orderB);
+
+    expect(diff.moved.length).toBe(2);
+    expect(diff.moved).toContainEqual({
+      file: 'a.js',
+      fromIndex: 0,
+      toIndex: 1,
+      direction: 'down',
+      distance: 1,
+      isLargeMove: false
     });
-
-    it('should calculate diff for completely different orders', () => {
-      const orderA = ['a.js', 'b.js', 'c.js'];
-      const orderB = ['c.js', 'b.js', 'a.js'];
-
-      const diff = calculateOrderDiff(orderA, orderB);
-
-      expect(diff.length).toBe(3);
-
-      const aFile = diff.find((d) => d.file === 'a.js');
-      expect(aFile.fromIndex).toBe(0);
-      expect(aFile.toIndex).toBe(2);
-      expect(aFile.change).toBe(2);
-      expect(aFile.category).toBe('moved-down');
-
-      const cFile = diff.find((d) => d.file === 'c.js');
-      expect(cFile.fromIndex).toBe(2);
-      expect(cFile.toIndex).toBe(0);
-      expect(cFile.change).toBe(-2);
-      expect(cFile.category).toBe('moved-up');
-    });
-
-    it('should handle files only in first order', () => {
-      const orderA = ['a.js', 'b.js', 'c.js'];
-      const orderB = ['a.js', 'c.js'];
-
-      const diff = calculateOrderDiff(orderA, orderB);
-
-      const bFile = diff.find((d) => d.file === 'b.js');
-      expect(bFile.category).toBe('removed');
-      expect(bFile.toIndex).toBe(-1);
-    });
-
-    it('should handle files only in second order', () => {
-      const orderA = ['a.js', 'c.js'];
-      const orderB = ['a.js', 'b.js', 'c.js'];
-
-      const diff = calculateOrderDiff(orderA, orderB);
-
-      const bFile = diff.find((d) => d.file === 'b.js');
-      expect(bFile.category).toBe('added');
-      expect(bFile.fromIndex).toBe(-1);
-    });
-
-    it('should calculate diff for large orders', () => {
-      const orderA = Array.from({ length: 100 }, (_, i) => `file${i}.js`);
-      const orderB = [...orderA].reverse();
-
-      const diff = calculateOrderDiff(orderA, orderB);
-
-      expect(diff.length).toBe(100);
-
-      // First file should move to last
-      const firstFile = diff.find((d) => d.file === 'file0.js');
-      expect(firstFile.fromIndex).toBe(0);
-      expect(firstFile.toIndex).toBe(99);
-      expect(firstFile.change).toBe(99);
-    });
-
-    it('should handle empty orders', () => {
-      const diff = calculateOrderDiff([], []);
-      expect(diff).toEqual([]);
-    });
-
-    it('should include all files from both orders', () => {
-      const orderA = ['a.js', 'b.js'];
-      const orderB = ['c.js', 'd.js'];
-
-      const diff = calculateOrderDiff(orderA, orderB);
-
-      expect(diff.length).toBe(4);
-      expect(diff.some((d) => d.file === 'a.js')).toBe(true);
-      expect(diff.some((d) => d.file === 'b.js')).toBe(true);
-      expect(diff.some((d) => d.file === 'c.js')).toBe(true);
-      expect(diff.some((d) => d.file === 'd.js')).toBe(true);
+    expect(diff.moved).toContainEqual({
+      file: 'b.js',
+      fromIndex: 1,
+      toIndex: 0,
+      direction: 'up',
+      distance: -1,
+      isLargeMove: false
     });
   });
 
-  describe('getPositionChange', () => {
-    it('should return positive for moved down', () => {
-      expect(getPositionChange(2, 5)).toBe(3);
-    });
+  it('detects large position changes (>10 positions)', () => {
+    const orderA = Array.from({ length: 20 }, (_, i) => `file${i}.js`);
+    const orderB = [...orderA];
 
-    it('should return negative for moved up', () => {
-      expect(getPositionChange(5, 2)).toBe(-3);
-    });
+    // Move file0.js from position 0 to position 15
+    orderB.splice(0, 1);
+    orderB.splice(15, 0, 'file0.js');
 
-    it('should return 0 for unchanged', () => {
-      expect(getPositionChange(3, 3)).toBe(0);
-    });
+    const diff = calculateOrderDiff(orderA, orderB);
 
-    it('should handle removed files', () => {
-      expect(getPositionChange(3, -1)).toBe(0);
-    });
-
-    it('should handle added files', () => {
-      expect(getPositionChange(-1, 3)).toBe(0);
-    });
+    const movedFile = diff.moved.find(m => m.file === 'file0.js');
+    expect(movedFile).toBeDefined();
+    expect(movedFile.distance).toBe(15);
+    expect(movedFile.direction).toBe('down');
+    expect(movedFile.isLargeMove).toBe(true);
   });
 
-  describe('categorizeChange', () => {
-    it('should categorize unchanged', () => {
-      expect(categorizeChange(3, 3)).toBe('unchanged');
-    });
+  it('detects files only in order B (added)', () => {
+    const orderA = ['a.js', 'b.js'];
+    const orderB = ['a.js', 'b.js', 'c.js'];
 
-    it('should categorize moved up', () => {
-      expect(categorizeChange(5, 2)).toBe('moved-up');
-    });
+    const diff = calculateOrderDiff(orderA, orderB);
 
-    it('should categorize moved down', () => {
-      expect(categorizeChange(2, 5)).toBe('moved-down');
-    });
-
-    it('should categorize added', () => {
-      expect(categorizeChange(-1, 3)).toBe('added');
-    });
-
-    it('should categorize removed', () => {
-      expect(categorizeChange(3, -1)).toBe('removed');
-    });
+    expect(diff.addedInB).toEqual(['c.js']);
   });
 
-  describe('formatPositionChange', () => {
-    it('should format unchanged position', () => {
-      expect(formatPositionChange(0)).toBe('No change');
-    });
+  it('detects files only in order A (removed)', () => {
+    const orderA = ['a.js', 'b.js', 'c.js'];
+    const orderB = ['a.js', 'c.js'];
 
-    it('should format moved up', () => {
-      expect(formatPositionChange(-3)).toBe('↑ 3 positions');
-    });
+    const diff = calculateOrderDiff(orderA, orderB);
 
-    it('should format moved down', () => {
-      expect(formatPositionChange(5)).toBe('↓ 5 positions');
-    });
+    expect(diff.removedFromB).toEqual(['b.js']);
+  });
 
-    it('should format single position up', () => {
-      expect(formatPositionChange(-1)).toBe('↑ 1 position');
-    });
+  it('calculates similarity score correctly', () => {
+    const orderA = ['a.js', 'b.js', 'c.js', 'd.js'];
+    const orderB = ['a.js', 'b.js', 'c.js', 'd.js']; // 100% identical
 
-    it('should format single position down', () => {
-      expect(formatPositionChange(1)).toBe('↓ 1 position');
-    });
+    const diff1 = calculateOrderDiff(orderA, orderB);
+    expect(diff1.similarityScore).toBe(100);
+
+    const orderC = ['d.js', 'c.js', 'b.js', 'a.js']; // Completely reversed
+    const diff2 = calculateOrderDiff(orderA, orderC);
+    expect(diff2.similarityScore).toBeLessThanOrEqual(50);
+
+    const orderD = ['a.js', 'c.js', 'b.js', 'd.js']; // Only b and c swapped
+    const diff3 = calculateOrderDiff(orderA, orderD);
+    expect(diff3.similarityScore).toBeGreaterThan(50);
+    expect(diff3.similarityScore).toBeLessThan(100);
+  });
+
+  it('handles edge case: empty orders', () => {
+    const diff = calculateOrderDiff([], []);
+
+    expect(diff.unchanged).toEqual([]);
+    expect(diff.moved).toEqual([]);
+    expect(diff.addedInB).toEqual([]);
+    expect(diff.removedFromB).toEqual([]);
+    expect(diff.similarityScore).toBe(100);
+  });
+
+  it('handles edge case: one empty order', () => {
+    const orderA = ['a.js', 'b.js'];
+    const orderB = [];
+
+    const diff = calculateOrderDiff(orderA, orderB);
+
+    expect(diff.removedFromB).toEqual(['a.js', 'b.js']);
+    expect(diff.similarityScore).toBe(0);
+  });
+
+  it('handles large file lists (100+ files)', () => {
+    const orderA = Array.from({ length: 200 }, (_, i) => `file${i}.js`);
+    const orderB = [...orderA].reverse();
+
+    const start = performance.now();
+    const diff = calculateOrderDiff(orderA, orderB);
+    const duration = performance.now() - start;
+
+    // Should complete in <50ms for 200 files
+    expect(duration).toBeLessThan(50);
+    expect(diff.moved.length).toBe(200);
+  });
+});
+
+describe('formatPositionChange', () => {
+  it('formats upward movement correctly', () => {
+    expect(formatPositionChange(-1)).toBe('↑1');
+    expect(formatPositionChange(-5)).toBe('↑5');
+  });
+
+  it('formats downward movement correctly', () => {
+    expect(formatPositionChange(1)).toBe('↓1');
+    expect(formatPositionChange(10)).toBe('↓10');
+  });
+
+  it('formats no change correctly', () => {
+    expect(formatPositionChange(0)).toBe('—');
   });
 });

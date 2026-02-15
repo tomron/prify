@@ -1,126 +1,137 @@
 /**
- * Order diff utilities
- * Calculate and visualize differences between file orders
+ * Order Diff Algorithm
+ * Compares two file orders and calculates differences, movements, and similarity
  */
 
 /**
- * Calculate diff between two orders
- * @param {Array<string>} orderA - First order (baseline)
- * @param {Array<string>} orderB - Second order (comparison)
- * @returns {Array<Object>} Diff entries with file, fromIndex, toIndex, change, category
+ * Calculate diff between two file orders
+ * @param {string[]} orderA - First file order
+ * @param {string[]} orderB - Second file order
+ * @returns {Object} Diff information including moved files, added, removed, and similarity score
  */
 export function calculateOrderDiff(orderA, orderB) {
-  // Get all unique files from both orders
-  const allFiles = new Set([...orderA, ...orderB]);
-
-  const diff = [];
-
-  for (const file of allFiles) {
-    const fromIndex = orderA.indexOf(file);
-    const toIndex = orderB.indexOf(file);
-    const change = getPositionChange(fromIndex, toIndex);
-    const category = categorizeChange(fromIndex, toIndex);
-
-    diff.push({
-      file,
-      fromIndex,
-      toIndex,
-      change,
-      category,
-    });
+  // Handle empty orders
+  if (orderA.length === 0 && orderB.length === 0) {
+    return {
+      unchanged: [],
+      moved: [],
+      addedInB: [],
+      removedFromB: [],
+      similarityScore: 100
+    };
   }
 
-  // Sort by the baseline order (orderA), with added files at the end
-  return diff.sort((a, b) => {
-    if (a.fromIndex === -1 && b.fromIndex === -1) {
-      // Both added, sort by position in orderB
-      return a.toIndex - b.toIndex;
+  if (orderA.length === 0) {
+    return {
+      unchanged: [],
+      moved: [],
+      addedInB: [...orderB],
+      removedFromB: [],
+      similarityScore: 0
+    };
+  }
+
+  if (orderB.length === 0) {
+    return {
+      unchanged: [],
+      moved: [],
+      addedInB: [],
+      removedFromB: [...orderA],
+      similarityScore: 0
+    };
+  }
+
+  // Create maps for O(1) lookup
+  const orderAMap = new Map(orderA.map((file, index) => [file, index]));
+  const orderBMap = new Map(orderB.map((file, index) => [file, index]));
+
+  // Find files in both orders
+  const commonFiles = orderA.filter(file => orderBMap.has(file));
+  const addedInB = orderB.filter(file => !orderAMap.has(file));
+  const removedFromB = orderA.filter(file => !orderBMap.has(file));
+
+  // Separate unchanged and moved files
+  const unchanged = [];
+  const moved = [];
+
+  commonFiles.forEach(file => {
+    const fromIndex = orderAMap.get(file);
+    const toIndex = orderBMap.get(file);
+    const distance = toIndex - fromIndex;
+
+    if (distance === 0) {
+      unchanged.push(file);
+    } else {
+      const direction = distance > 0 ? 'down' : 'up';
+      const isLargeMove = Math.abs(distance) > 10;
+
+      moved.push({
+        file,
+        fromIndex,
+        toIndex,
+        direction,
+        distance,
+        isLargeMove
+      });
     }
-    if (a.fromIndex === -1) return 1; // a is added, put after b
-    if (b.fromIndex === -1) return -1; // b is added, put after a
-    return a.fromIndex - b.fromIndex; // Both exist, sort by orderA position
   });
+
+  // Calculate similarity score (0-100)
+  const similarityScore = calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap);
+
+  return {
+    unchanged,
+    moved,
+    addedInB,
+    removedFromB,
+    similarityScore
+  };
 }
 
 /**
- * Get position change between two indices
- * @param {number} fromIndex - Original index (-1 if not present)
- * @param {number} toIndex - New index (-1 if not present)
- * @returns {number} Position change (positive = moved down, negative = moved up)
+ * Calculate similarity score between two orders
+ * Uses normalized position distance metric
+ * @param {string[]} orderA
+ * @param {string[]} orderB
+ * @param {string[]} commonFiles
+ * @param {Map} orderAMap
+ * @param {Map} orderBMap
+ * @returns {number} Similarity score from 0-100
  */
-export function getPositionChange(fromIndex, toIndex) {
-  if (fromIndex === -1 || toIndex === -1) {
-    return 0; // Added or removed, no meaningful change
+function calculateSimilarity(orderA, orderB, commonFiles, orderAMap, orderBMap) {
+  if (commonFiles.length === 0) {
+    return 0;
   }
-  return toIndex - fromIndex;
-}
 
-/**
- * Categorize the type of change
- * @param {number} fromIndex - Original index
- * @param {number} toIndex - New index
- * @returns {string} Category: unchanged, moved-up, moved-down, added, removed
- */
-export function categorizeChange(fromIndex, toIndex) {
-  if (fromIndex === -1 && toIndex !== -1) {
-    return 'added';
-  }
-  if (fromIndex !== -1 && toIndex === -1) {
-    return 'removed';
-  }
-  if (fromIndex === toIndex) {
-    return 'unchanged';
-  }
-  if (toIndex < fromIndex) {
-    return 'moved-up';
-  }
-  return 'moved-down';
+  // Calculate average position difference
+  let totalDistance = 0;
+  const maxPossibleDistance = Math.max(orderA.length, orderB.length);
+
+  commonFiles.forEach(file => {
+    const posA = orderAMap.get(file);
+    const posB = orderBMap.get(file);
+    totalDistance += Math.abs(posB - posA);
+  });
+
+  // Normalize: 0 distance = 100% similar, max distance = 0% similar
+  const avgDistance = totalDistance / commonFiles.length;
+  const normalizedDistance = avgDistance / maxPossibleDistance;
+  const similarity = Math.max(0, Math.min(100, Math.round((1 - normalizedDistance) * 100)));
+
+  return similarity;
 }
 
 /**
  * Format position change for display
- * @param {number} change - Position change
- * @returns {string} Formatted change (e.g., "↑ 3 positions", "No change")
+ * @param {number} distance - Signed distance (negative = up, positive = down, 0 = no change)
+ * @returns {string} Formatted string with arrow and distance
  */
-export function formatPositionChange(change) {
-  if (change === 0) {
-    return 'No change';
+export function formatPositionChange(distance) {
+  if (distance === 0) {
+    return '—';
   }
-
-  const absChange = Math.abs(change);
-  const positions = absChange === 1 ? 'position' : 'positions';
-
-  if (change < 0) {
-    return `↑ ${absChange} ${positions}`;
+  if (distance < 0) {
+    return `↑${Math.abs(distance)}`;
   }
-
-  return `↓ ${absChange} ${positions}`;
-}
-
-/**
- * Get diff statistics
- * @param {Array<Object>} diff - Diff result from calculateOrderDiff
- * @returns {Object} Statistics: unchanged, movedUp, movedDown, added, removed
- */
-export function getDiffStats(diff) {
-  const stats = {
-    unchanged: 0,
-    movedUp: 0,
-    movedDown: 0,
-    added: 0,
-    removed: 0,
-    totalChanges: 0,
-  };
-
-  for (const entry of diff) {
-    if (entry.category === 'unchanged') stats.unchanged++;
-    else if (entry.category === 'moved-up') stats.movedUp++;
-    else if (entry.category === 'moved-down') stats.movedDown++;
-    else if (entry.category === 'added') stats.added++;
-    else if (entry.category === 'removed') stats.removed++;
-  }
-
-  stats.totalChanges = diff.length - stats.unchanged;
-
-  return stats;
+  return `↓${distance}`;
 }

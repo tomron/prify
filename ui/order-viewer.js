@@ -3,6 +3,8 @@
  * Display all user orders, consensus, and agreement metrics
  */
 
+import { calculateOrderDiff, formatPositionChange } from '../utils/order-diff.js';
+
 /**
  * Create and show order viewer modal
  * @param {Object} options - Modal options
@@ -341,7 +343,7 @@ function createOrdersSection(orders, onSelectOrder) {
   });
 
   sortedOrders.forEach((order) => {
-    const orderCard = createOrderCard(order, onSelectOrder);
+    const orderCard = createOrderCard(order, sortedOrders, onSelectOrder);
     section.appendChild(orderCard);
   });
 
@@ -351,10 +353,11 @@ function createOrdersSection(orders, onSelectOrder) {
 /**
  * Create order card
  * @param {Object} order - Order data
+ * @param {Array<Object>} allOrders - All orders (for comparison)
  * @param {Function} [onSelectOrder] - Callback when order selected
  * @returns {HTMLElement}
  */
-function createOrderCard(order, onSelectOrder) {
+function createOrderCard(order, allOrders, onSelectOrder) {
   const card = document.createElement('div');
   card.className = 'pr-viewer-order-card';
 
@@ -420,6 +423,10 @@ function createOrderCard(order, onSelectOrder) {
 
   card.appendChild(fileList);
 
+  // Buttons container
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'pr-viewer-card-buttons';
+
   // Apply button
   if (onSelectOrder) {
     const applyBtn = document.createElement('button');
@@ -429,8 +436,21 @@ function createOrderCard(order, onSelectOrder) {
     applyBtn.addEventListener('click', () => {
       onSelectOrder(order.order);
     });
-    card.appendChild(applyBtn);
+    buttonsContainer.appendChild(applyBtn);
   }
+
+  // Compare button (if there are other orders)
+  if (allOrders && allOrders.length > 1) {
+    const compareBtn = document.createElement('button');
+    compareBtn.className = 'pr-reorder-btn pr-reorder-btn-tertiary pr-viewer-compare-btn';
+    compareBtn.textContent = 'Compare...';
+    compareBtn.addEventListener('click', () => {
+      showCompareMenu(order, allOrders);
+    });
+    buttonsContainer.appendChild(compareBtn);
+  }
+
+  card.appendChild(buttonsContainer);
 
   return card;
 }
@@ -455,4 +475,344 @@ function formatTimestamp(date) {
   if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
 
   return date.toLocaleDateString();
+}
+
+/**
+ * Show compare menu to select which order to compare with
+ * @param {Object} currentOrder - Current order to compare
+ * @param {Array<Object>} allOrders - All available orders
+ */
+function showCompareMenu(currentOrder, allOrders) {
+  // Filter out the current order
+  const otherOrders = allOrders.filter(o => o !== currentOrder);
+
+  if (otherOrders.length === 0) {
+    return;
+  }
+
+  // Create dropdown menu
+  const menu = document.createElement('div');
+  menu.className = 'pr-compare-menu';
+
+  const title = document.createElement('div');
+  title.className = 'pr-compare-menu-title';
+  title.textContent = 'Compare with:';
+  menu.appendChild(title);
+
+  otherOrders.forEach(otherOrder => {
+    const item = document.createElement('button');
+    item.className = 'pr-compare-menu-item';
+
+    const user = document.createElement('span');
+    user.className = 'pr-compare-menu-user';
+    user.textContent = otherOrder.user || 'Unknown';
+
+    const timestamp = document.createElement('span');
+    timestamp.className = 'pr-compare-menu-timestamp';
+    if (otherOrder.timestamp) {
+      const date = new Date(otherOrder.timestamp);
+      timestamp.textContent = formatTimestamp(date);
+    }
+
+    item.appendChild(user);
+    item.appendChild(timestamp);
+
+    item.addEventListener('click', () => {
+      menu.remove();
+      createDiffViewerModal({
+        orderA: currentOrder.order,
+        orderB: otherOrder.order,
+        titleA: currentOrder.user || 'Unknown',
+        titleB: otherOrder.user || 'Unknown'
+      });
+    });
+
+    menu.appendChild(item);
+  });
+
+  // Position near the button that triggered it
+  document.body.appendChild(menu);
+
+  // Close menu on outside click
+  const closeMenu = (e) => {
+    if (!menu.contains(e.target)) {
+      menu.remove();
+      document.removeEventListener('click', closeMenu);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', closeMenu), 0);
+}
+
+/**
+ * Create diff visualization modal
+ * @param {Object} options - Modal options
+ * @param {Array<string>} options.orderA - First order
+ * @param {Array<string>} options.orderB - Second order
+ * @param {string} options.titleA - Title for order A
+ * @param {string} options.titleB - Title for order B
+ * @param {Function} [options.onClose] - Callback when modal closes
+ * @returns {Object} Modal instance
+ */
+export function createDiffViewerModal(options = {}) {
+  const { orderA, orderB, titleA = 'Order A', titleB = 'Order B', onClose } = options;
+
+  // Calculate diff
+  const diff = calculateOrderDiff(orderA, orderB);
+
+  // Create modal structure
+  const overlay = createModalOverlay();
+  const modal = createModalDialog();
+  modal.classList.add('pr-reorder-diff-modal');
+
+  const header = createDiffModalHeader(titleA, titleB, diff);
+  const body = createDiffModalBody(orderA, orderB, diff);
+  const footer = createModalFooter();
+
+  modal.appendChild(header);
+  modal.appendChild(body);
+  modal.appendChild(footer);
+  overlay.appendChild(modal);
+
+  // Setup close handlers
+  const closeBtn = header.querySelector('.pr-reorder-modal-close');
+  const doneBtn = footer.querySelector('[data-action="done"]');
+
+  const close = () => {
+    overlay.remove();
+    if (onClose) onClose();
+  };
+
+  closeBtn.addEventListener('click', close);
+  doneBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      close();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+
+  document.body.appendChild(overlay);
+
+  return { close };
+}
+
+/**
+ * Create diff modal header
+ * @param {string} titleA - Title for order A
+ * @param {string} titleB - Title for order B
+ * @param {Object} diff - Diff calculation result
+ * @returns {HTMLElement}
+ */
+function createDiffModalHeader(titleA, titleB, diff) {
+  const header = document.createElement('div');
+  header.className = 'pr-reorder-modal-header';
+  
+  const title = document.createElement('h2');
+  title.id = 'pr-viewer-modal-title';
+  title.className = 'pr-reorder-modal-title';
+  title.textContent = 'Order Comparison';
+  
+  const subtitle = document.createElement('div');
+  subtitle.className = 'pr-reorder-modal-subtitle';
+  subtitle.textContent = `${titleA} vs ${titleB}`;
+  
+  const similarity = document.createElement('div');
+  similarity.className = 'pr-diff-similarity-badge';
+  similarity.textContent = `${diff.similarityScore}% similar`;
+  
+  // Color code similarity
+  if (diff.similarityScore >= 80) {
+    similarity.classList.add('pr-diff-similarity-high');
+  } else if (diff.similarityScore >= 50) {
+    similarity.classList.add('pr-diff-similarity-medium');
+  } else {
+    similarity.classList.add('pr-diff-similarity-low');
+  }
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'pr-reorder-modal-close';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.innerHTML = '&times;';
+  
+  header.appendChild(title);
+  header.appendChild(subtitle);
+  header.appendChild(similarity);
+  header.appendChild(closeBtn);
+  
+  return header;
+}
+
+/**
+ * Create diff modal body
+ * @param {Array<string>} orderA - First order
+ * @param {Array<string>} orderB - Second order
+ * @param {Object} diff - Diff calculation result
+ * @returns {HTMLElement}
+ */
+function createDiffModalBody(orderA, orderB, diff) {
+  const body = document.createElement('div');
+  body.className = 'pr-reorder-modal-body pr-diff-modal-body';
+  
+  // Summary section
+  const summary = createDiffSummary(diff);
+  body.appendChild(summary);
+  
+  // Side-by-side comparison
+  const comparison = createSideBySideComparison(orderA, orderB, diff);
+  body.appendChild(comparison);
+  
+  return body;
+}
+
+/**
+ * Create diff summary section
+ * @param {Object} diff - Diff calculation result
+ * @returns {HTMLElement}
+ */
+function createDiffSummary(diff) {
+  const summary = document.createElement('div');
+  summary.className = 'pr-diff-summary';
+  
+  const stats = [
+    { label: 'Unchanged', value: diff.unchanged.length, className: 'unchanged' },
+    { label: 'Moved', value: diff.moved.length, className: 'moved' },
+    { label: 'Added', value: diff.addedInB.length, className: 'added' },
+    { label: 'Removed', value: diff.removedFromB.length, className: 'removed' }
+  ];
+  
+  stats.forEach(stat => {
+    const item = document.createElement('div');
+    item.className = `pr-diff-stat pr-diff-stat-${stat.className}`;
+    
+    const value = document.createElement('span');
+    value.className = 'pr-diff-stat-value';
+    value.textContent = stat.value;
+    
+    const label = document.createElement('span');
+    label.className = 'pr-diff-stat-label';
+    label.textContent = stat.label;
+    
+    item.appendChild(value);
+    item.appendChild(label);
+    summary.appendChild(item);
+  });
+  
+  return summary;
+}
+
+/**
+ * Create side-by-side comparison
+ * @param {Array<string>} orderA - First order
+ * @param {Array<string>} orderB - Second order
+ * @param {Object} diff - Diff calculation result
+ * @returns {HTMLElement}
+ */
+function createSideBySideComparison(orderA, orderB, diff) {
+  const container = document.createElement('div');
+  container.className = 'pr-diff-comparison';
+  
+  const columnA = createDiffColumn(orderA, 'A', diff, true);
+  const columnB = createDiffColumn(orderB, 'B', diff, false);
+  
+  container.appendChild(columnA);
+  container.appendChild(columnB);
+  
+  return container;
+}
+
+/**
+ * Create diff column
+ * @param {Array<string>} order - File order
+ * @param {string} label - Column label
+ * @param {Object} diff - Diff calculation result
+ * @param {boolean} isOrderA - Whether this is order A
+ * @returns {HTMLElement}
+ */
+function createDiffColumn(order, label, diff, isOrderA) {
+  const column = document.createElement('div');
+  column.className = 'pr-diff-column';
+  
+  const header = document.createElement('div');
+  header.className = 'pr-diff-column-header';
+  header.textContent = `Order ${label}`;
+  column.appendChild(header);
+  
+  const fileList = document.createElement('div');
+  fileList.className = 'pr-diff-file-list';
+  
+  order.forEach((file, index) => {
+    const item = createDiffFileItem(file, index, diff, isOrderA);
+    fileList.appendChild(item);
+  });
+  
+  column.appendChild(fileList);
+  
+  return column;
+}
+
+/**
+ * Create diff file item
+ * @param {string} file - File path
+ * @param {number} index - Position in order
+ * @param {Object} diff - Diff calculation result
+ * @param {boolean} isOrderA - Whether this is order A
+ * @returns {HTMLElement}
+ */
+function createDiffFileItem(file, index, diff, isOrderA) {
+  const item = document.createElement('div');
+  item.className = 'pr-diff-file-item';
+  
+  // Determine file status
+  let status = 'unchanged';
+  let movement = null;
+  
+  if (diff.addedInB.includes(file) && !isOrderA) {
+    status = 'added';
+  } else if (diff.removedFromB.includes(file) && isOrderA) {
+    status = 'removed';
+  } else {
+    const movedFile = diff.moved.find(m => m.file === file);
+    if (movedFile) {
+      status = 'moved';
+      movement = movedFile;
+    }
+  }
+  
+  item.classList.add(`pr-diff-file-${status}`);
+  if (movement && movement.isLargeMove) {
+    item.classList.add('pr-diff-file-large-move');
+  }
+  
+  // Position
+  const position = document.createElement('span');
+  position.className = 'pr-diff-file-position';
+  position.textContent = `${index + 1}`;
+  
+  // File path
+  const path = document.createElement('span');
+  path.className = 'pr-diff-file-path';
+  path.textContent = file;
+  
+  // Movement indicator
+  if (movement) {
+    const indicator = document.createElement('span');
+    indicator.className = 'pr-diff-file-movement';
+    indicator.textContent = formatPositionChange(
+      isOrderA ? movement.distance : -movement.distance
+    );
+
+    item.appendChild(position);
+    item.appendChild(path);
+    item.appendChild(indicator);
+  } else {
+    item.appendChild(position);
+    item.appendChild(path);
+  }
+  
+  return item;
 }
