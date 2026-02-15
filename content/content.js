@@ -21,6 +21,8 @@ import {
 } from './github-api.js';
 import { calculateConsensus, getConsensusMetadata } from './consensus.js';
 import { getCleanupManager, cleanup } from '../utils/cleanup-manager.js';
+import { shouldShowTour } from '../utils/onboarding.js';
+import { createOnboardingTour } from '../ui/onboarding-tour.js';
 
 // Extension state
 let extensionLoaded = false;
@@ -70,6 +72,33 @@ async function init() {
   document.documentElement.setAttribute('data-pr-reorder', 'loaded');
 
   console.log('[PR-Reorder] Extension initialized');
+
+  // Show onboarding tour for first-time users
+  initializeOnboarding();
+}
+
+/**
+ * Initialize onboarding tour for first-time users
+ */
+async function initializeOnboarding() {
+  try {
+    const showTour = await shouldShowTour();
+    if (showTour) {
+      // Wait a bit for UI to settle before showing tour
+      setTimeout(() => {
+        createOnboardingTour({
+          onComplete: () => {
+            console.log('[PR-Reorder] Onboarding tour completed');
+          },
+          onSkip: () => {
+            console.log('[PR-Reorder] Onboarding tour skipped');
+          },
+        });
+      }, 1000);
+    }
+  } catch (error) {
+    console.error('[PR-Reorder] Failed to initialize onboarding:', error);
+  }
 }
 
 /**
