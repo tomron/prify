@@ -3,88 +3,6 @@
  * Follows GitHub's design system for seamless integration
  */
 
-/* === CSS Variables and Design Tokens === */
-:root {
-  /* GitHub Color Palette References */
-  --pr-color-text-primary: #24292f;
-  --pr-color-text-secondary: #57606a;
-  --pr-color-text-tertiary: #6e7781;
-  --pr-color-text-link: #0969da;
-  --pr-color-text-success: #1a7f37;
-  --pr-color-text-danger: #cf222e;
-  --pr-color-text-warning: #9a6700;
-
-  --pr-color-bg-primary: #ffffff;
-  --pr-color-bg-secondary: #f6f8fa;
-  --pr-color-bg-tertiary: #f3f4f6;
-  --pr-color-bg-overlay: rgba(27, 31, 36, 0.5);
-
-  --pr-color-border-default: #d0d7de;
-  --pr-color-border-muted: #e1e4e8;
-  --pr-color-border-emphasis: #8c959f;
-
-  --pr-color-accent-primary: #2da44e;
-  --pr-color-accent-emphasis: #0969da;
-  --pr-color-accent-danger: #cf222e;
-
-  /* Spacing Tokens (4px grid) */
-  --pr-space-1: 4px;
-  --pr-space-2: 8px;
-  --pr-space-3: 12px;
-  --pr-space-4: 16px;
-  --pr-space-6: 24px;
-  --pr-space-8: 32px;
-
-  /* Animation Timing Constants */
-  --pr-duration-fast: 100ms;
-  --pr-duration-medium: 150ms;
-  --pr-duration-normal: 200ms;
-  --pr-duration-slow: 250ms;
-  --pr-duration-slower: 300ms;
-
-  /* Animation Easing */
-  --pr-ease-out: cubic-bezier(0.2, 0, 0, 1);
-  --pr-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Shadow Tokens */
-  --pr-shadow-small: 0 1px 0 rgba(27, 31, 36, 0.1);
-  --pr-shadow-medium: 0 2px 8px rgba(27, 31, 36, 0.1);
-  --pr-shadow-large: 0 8px 24px rgba(27, 31, 36, 0.4);
-
-  /* Border Radius Tokens */
-  --pr-radius-small: 4px;
-  --pr-radius-medium: 6px;
-  --pr-radius-large: 12px;
-}
-
-/* Dark mode color overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --pr-color-text-primary: #c9d1d9;
-    --pr-color-text-secondary: #8b949e;
-    --pr-color-text-tertiary: #6e7681;
-    --pr-color-text-link: #58a6ff;
-    --pr-color-text-success: #3fb950;
-    --pr-color-text-danger: #f85149;
-    --pr-color-text-warning: #f0b72f;
-
-    --pr-color-bg-primary: #0d1117;
-    --pr-color-bg-secondary: #161b22;
-    --pr-color-bg-tertiary: #21262d;
-    --pr-color-bg-overlay: rgba(1, 4, 9, 0.8);
-
-    --pr-color-border-default: #30363d;
-    --pr-color-border-muted: #21262d;
-    --pr-color-border-emphasis: #8b949e;
-
-    --pr-color-accent-primary: #2ea043;
-    --pr-color-accent-emphasis: #58a6ff;
-    --pr-color-accent-danger: #f85149;
-
-    --pr-shadow-large: 0 8px 24px rgba(1, 4, 9, 0.8);
-  }
-}
-
 /* === Extension Container === */
 .pr-reorder-root {
   font-family:
@@ -99,7 +17,7 @@
 .pr-reorder-btn {
   position: relative;
   display: inline-block;
-  padding: 6px var(--pr-space-4);
+  padding: 5px 16px;
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
@@ -108,35 +26,26 @@
   cursor: pointer;
   user-select: none;
   border: 1px solid;
-  border-radius: var(--pr-radius-medium);
+  border-radius: 6px;
   appearance: none;
   transition:
-    background-color var(--pr-duration-fast) var(--pr-ease-out),
-    border-color var(--pr-duration-fast) var(--pr-ease-out),
-    transform var(--pr-duration-fast) var(--pr-ease-out),
-    box-shadow var(--pr-duration-fast) var(--pr-ease-out);
+    background-color 0.2s,
+    border-color 0.2s;
 }
 
 .pr-reorder-btn-primary {
   color: #ffffff;
-  background-color: var(--pr-color-accent-primary);
+  background-color: #2da44e;
   border-color: rgba(27, 31, 36, 0.15);
-  box-shadow:
-    var(--pr-shadow-small),
-    0 1px 2px rgba(27, 31, 36, 0.12);
-  font-weight: 600;
+  box-shadow: 0 1px 0 rgba(27, 31, 36, 0.1);
 }
 
 .pr-reorder-btn-primary:hover {
   background-color: #2c974b;
-  box-shadow: var(--pr-shadow-medium);
-  transform: translateY(-1px);
 }
 
 .pr-reorder-btn-primary:active {
   background-color: #298e46;
-  transform: translateY(0);
-  box-shadow: var(--pr-shadow-small);
 }
 
 .pr-reorder-btn-secondary {
@@ -146,14 +55,8 @@
 }
 
 .pr-reorder-btn-secondary:hover {
-  background-color: var(--pr-color-bg-tertiary);
+  background-color: #f3f4f6;
   border-color: rgba(27, 31, 36, 0.25);
-}
-
-/* Micro-interaction: Button click effect */
-.pr-reorder-btn:active {
-  transform: scale(0.98);
-  transition-duration: var(--pr-duration-fast);
 }
 
 .pr-reorder-btn-danger {
@@ -164,6 +67,25 @@
 
 .pr-reorder-btn-danger:hover {
   background-color: #a40e26;
+}
+
+/* Task 13.5: Focus ring styles for buttons */
+.pr-reorder-btn:focus {
+  outline: 2px solid var(--pr-color-focus, #0969da);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+}
+
+.pr-reorder-btn:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-btn:focus {
+    outline-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.4);
+  }
 }
 
 /* === Modal === */
@@ -191,18 +113,15 @@
 }
 
 .pr-reorder-modal {
-  background-color: var(--pr-color-bg-primary);
-  border-radius: var(--pr-radius-large);
-  box-shadow:
-    var(--pr-shadow-large),
-    0 0 0 1px var(--pr-color-border-muted);
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(27, 31, 36, 0.15);
   max-width: 600px;
   max-height: 80vh;
   width: 90%;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
-  opacity: 1;
 }
 
 @keyframes slideUp {
@@ -216,54 +135,19 @@
   }
 }
 
-/* Enhanced modal animations */
-@keyframes modalEnter {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes modalExit {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-.pr-reorder-modal-entering {
-  animation: modalEnter var(--pr-duration-slow) var(--pr-ease-out);
-}
-
-.pr-reorder-modal-exiting {
-  animation: modalExit var(--pr-duration-normal) var(--pr-ease-out);
-}
-
 .pr-reorder-modal-header {
-  padding: var(--pr-space-4) var(--pr-space-6);
-  border-bottom: 1px solid var(--pr-color-border-default);
+  padding: 16px 24px;
+  border-bottom: 1px solid #d0d7de;
   display: flex;
-  flex-direction: column;
-  background-color: var(--pr-color-bg-primary);
-  border-top-left-radius: var(--pr-radius-large);
-  border-top-right-radius: var(--pr-radius-large);
+  align-items: center;
+  justify-content: space-between;
 }
 
 .pr-reorder-modal-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 1.25;
   margin: 0;
-  color: var(--pr-color-text-primary);
-  letter-spacing: -0.01em;
+  color: #24292f;
 }
 
 .pr-reorder-modal-close {
@@ -280,70 +164,22 @@
 }
 
 .pr-reorder-modal-close:hover {
-  background-color: var(--pr-color-bg-tertiary);
-}
-
-.pr-reorder-modal-close:active {
-  transform: scale(0.95);
-}
-
-/* === Preset Bar === */
-.pr-reorder-preset-bar {
-  padding: var(--pr-space-3) var(--pr-space-6);
-  border-bottom: 1px solid var(--pr-color-border-default);
-  display: flex;
-  align-items: center;
-  gap: var(--pr-space-3);
-  background-color: var(--pr-color-bg-secondary);
-}
-
-.pr-reorder-preset-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #24292f;
-}
-
-.pr-reorder-preset-select {
-  flex: 1;
-  padding: 5px 12px;
-  font-size: 14px;
-  line-height: 20px;
-  color: #24292f;
-  background-color: #ffffff;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.pr-reorder-preset-select:focus {
-  outline: none;
-  border-color: var(--pr-color-accent-emphasis);
-  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
-}
-
-/* Micro-interaction: Dropdown hover */
-.pr-reorder-preset-select:hover {
-  border-color: var(--pr-color-border-emphasis);
-  transition: border-color var(--pr-duration-fast) var(--pr-ease-out);
+  background-color: #f3f4f6;
 }
 
 .pr-reorder-modal-body {
   padding: 16px 24px;
   overflow-y: auto;
   flex: 1;
-  background-color: var(--pr-color-bg-primary);
 }
 
 .pr-reorder-modal-footer {
   padding: 16px 24px;
-  border-top: 1px solid var(--pr-color-border-default);
+  border-top: 1px solid #d0d7de;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background-color: var(--pr-color-bg-primary);
-  border-bottom-left-radius: var(--pr-radius-large);
-  border-bottom-right-radius: var(--pr-radius-large);
 }
 
 .pr-reorder-footer-left,
@@ -362,81 +198,79 @@
 .pr-reorder-file-item {
   display: flex;
   align-items: center;
-  padding: var(--pr-space-3);
-  border: 1px solid var(--pr-color-border-default);
-  border-radius: var(--pr-radius-small);
-  margin-bottom: var(--pr-space-2);
-  background-color: var(--pr-color-bg-primary);
-  box-shadow: var(--pr-shadow-small);
+  padding: 8px 10px;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  background-color: #ffffff;
   cursor: move;
-  transition: all var(--pr-duration-normal) var(--pr-ease-out);
+  transition: all 0.2s;
 }
 
 .pr-reorder-file-item:hover {
-  background-color: var(--pr-color-bg-secondary);
-  border-color: var(--pr-color-border-emphasis);
-  box-shadow: var(--pr-shadow-medium);
-  transform: translateY(-1px);
+  background-color: #f6f8fa;
+  border-color: #8c959f;
 }
 
-/* Drag-and-drop animations with GPU acceleration */
 .pr-reorder-file-item.dragging {
-  opacity: 0.8;
-  transform: scale(1.02) translateY(-2px) rotate(1deg);
-  box-shadow:
-    0 4px 12px rgba(27, 31, 36, 0.2),
-    0 0 0 1px var(--pr-color-border-emphasis);
-  cursor: grabbing;
-  transition: none; /* Disable transitions during drag */
-  will-change: transform, opacity;
+  opacity: 0.5;
+  transform: rotate(2deg);
 }
 
 .pr-reorder-file-item.drag-over {
-  border-color: var(--pr-color-accent-primary);
-  background-color: rgba(26, 127, 55, 0.1);
-  transform: translateX(8px);
-  transition: all var(--pr-duration-medium) var(--pr-ease-out);
+  border-color: #2da44e;
+  background-color: #dafbe1;
 }
 
-/* Drag lift animation */
-@keyframes dragLift {
-  from {
-    transform: scale(1) translateY(0);
-  }
-  to {
-    transform: scale(1.02) translateY(-2px);
+/* Task 13.1, 13.2, 13.3: Focus indicators for file items */
+.pr-reorder-file-item:focus {
+  outline: 3px solid var(--pr-color-focus, #0969da);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 3px rgba(9, 105, 218, 0.3),
+    0 1px 0 rgba(27, 31, 36, 0.1);
+}
+
+/* Task 13.4: Ensure focus indicators work in dark mode */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-file-item:focus {
+    outline-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow:
+      0 0 0 3px rgba(88, 166, 255, 0.4),
+      0 1px 0 rgba(240, 246, 252, 0.1);
   }
 }
 
-/* Drop completion animation */
-.pr-reorder-file-item.dropping {
-  animation: dropComplete var(--pr-duration-normal) var(--pr-ease-out);
+/* Task 12.2: Visual indication for keyboard drag mode */
+.pr-reorder-file-item.pr-reorder-drag-mode {
+  background-color: #ddf4ff;
+  border-color: #0969da;
+  border-width: 2px;
+  box-shadow:
+    0 0 0 3px rgba(9, 105, 218, 0.2),
+    0 2px 8px rgba(9, 105, 218, 0.15);
+  outline: 3px solid #0969da;
+  outline-offset: 2px;
 }
 
-@keyframes dropComplete {
-  0% {
-    transform: scale(1.02) translateY(-2px);
-  }
-  50% {
-    transform: scale(0.98) translateY(1px);
-  }
-  100% {
-    transform: scale(1) translateY(0);
+/* Dark mode drag mode indication */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-file-item.pr-reorder-drag-mode {
+    background-color: #1a2f3a;
+    border-color: #58a6ff;
+    box-shadow:
+      0 0 0 3px rgba(88, 166, 255, 0.3),
+      0 2px 8px rgba(88, 166, 255, 0.2);
+    outline-color: #58a6ff;
   }
 }
 
 .pr-reorder-file-handle {
-  width: 24px;
-  height: 24px;
-  margin-right: var(--pr-space-3);
-  color: var(--pr-color-text-secondary);
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  color: #57606a;
   flex-shrink: 0;
-  opacity: 0.6;
-  transition: opacity var(--pr-duration-fast) var(--pr-ease-out);
-}
-
-.pr-reorder-file-item:hover .pr-reorder-file-handle {
-  opacity: 1;
 }
 
 .pr-reorder-file-path {
@@ -444,33 +278,27 @@
   font-family:
     ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
     monospace;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--pr-color-text-primary);
+  font-size: 12px;
+  color: #24292f;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .pr-reorder-file-changes {
-  margin-left: var(--pr-space-3);
+  margin-left: 8px;
   font-size: 11px;
-  color: var(--pr-color-text-secondary);
-  display: flex;
-  gap: var(--pr-space-1);
+  color: #57606a;
 }
 
 .pr-reorder-file-additions {
-  color: var(--pr-color-text-success);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  color: #1a7f37;
+  font-weight: 600;
 }
 
 .pr-reorder-file-deletions {
-  color: var(--pr-color-text-danger);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  color: #cf222e;
+  font-weight: 600;
 }
 
 /* === Badge === */
@@ -507,20 +335,15 @@
   right: 24px;
   background-color: #24292f;
   color: #ffffff;
-  padding: var(--pr-space-3) var(--pr-space-4);
-  border-radius: var(--pr-radius-medium);
-  box-shadow: var(--pr-shadow-large);
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(27, 31, 36, 0.3);
   display: flex;
   align-items: center;
-  gap: var(--pr-space-3);
+  gap: 12px;
   max-width: 400px;
-  min-width: 280px;
   z-index: 10000;
   animation: slideInRight 0.3s ease-out;
-  transition:
-    bottom var(--pr-duration-normal) var(--pr-ease-out),
-    opacity var(--pr-duration-normal) var(--pr-ease-out),
-    transform var(--pr-duration-normal) var(--pr-ease-out);
 }
 
 @keyframes slideInRight {
@@ -555,27 +378,6 @@
 .pr-reorder-toast-message {
   flex: 1;
   font-size: 14px;
-  line-height: 1.4;
-}
-
-.pr-reorder-toast-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color var(--pr-duration-fast) var(--pr-ease-out);
-}
-
-.pr-reorder-toast-close:hover {
-  color: rgba(255, 255, 255, 1);
 }
 
 /* === Loading Spinner === */
@@ -744,42 +546,28 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--pr-space-8) var(--pr-space-6);
+  padding: 48px 24px;
   text-align: center;
-  min-height: 200px;
 }
 
 .pr-reorder-empty-state-icon {
   font-size: 48px;
-  margin-bottom: var(--pr-space-4);
-  opacity: 0.5;
-  color: var(--pr-color-text-secondary);
+  margin-bottom: 16px;
+  opacity: 0.6;
 }
 
 .pr-reorder-empty-state-title {
-  margin: 0 0 var(--pr-space-2) 0;
+  margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 600;
-  line-height: 1.4;
-  color: var(--pr-color-text-primary);
+  color: #24292f;
 }
 
 .pr-reorder-empty-state-message {
-  margin: 0 0 var(--pr-space-6) 0;
+  margin: 0 0 24px 0;
   font-size: 14px;
-  line-height: 1.6;
-  color: var(--pr-color-text-secondary);
+  color: #586069;
   max-width: 400px;
-}
-
-/* Empty state variants */
-.pr-reorder-empty-state-search {
-  padding: var(--pr-space-6) var(--pr-space-4);
-  min-height: 150px;
-}
-
-.pr-reorder-empty-state-search .pr-reorder-empty-state-icon {
-  font-size: 32px;
 }
 
 /* === Utilities === */
@@ -807,44 +595,12 @@
 
   .pr-reorder-modal {
     background-color: #0d1117;
-    box-shadow:
-      0 8px 24px rgba(1, 4, 9, 0.8),
-      0 0 0 1px rgba(240, 246, 252, 0.1);
-    opacity: 1;
+    box-shadow: 0 8px 24px rgba(1, 4, 9, 0.8);
   }
 
-  .pr-reorder-modal-header {
-    border-color: #30363d;
-    background-color: #0d1117;
-  }
-
-  .pr-reorder-modal-body {
-    background-color: #0d1117;
-  }
-
+  .pr-reorder-modal-header,
   .pr-reorder-modal-footer {
     border-color: #30363d;
-    background-color: #0d1117;
-  }
-
-  .pr-reorder-preset-bar {
-    background-color: #161b22;
-    border-color: #30363d;
-  }
-
-  .pr-reorder-preset-label {
-    color: #c9d1d9;
-  }
-
-  .pr-reorder-preset-select {
-    background-color: #0d1117;
-    border-color: #30363d;
-    color: #c9d1d9;
-  }
-
-  .pr-reorder-preset-select:focus {
-    border-color: #58a6ff;
-    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
   }
 
   .pr-reorder-modal-title {
@@ -1098,7 +854,6 @@
   border: 1px solid #d0d7de;
   border-radius: 8px;
   background-color: #ffffff;
-  opacity: 1;
 }
 
 .pr-viewer-order-header {
@@ -1166,7 +921,6 @@
   .pr-viewer-order-card {
     background-color: #0d1117;
     border-color: #30363d;
-    opacity: 1;
   }
 
   .pr-viewer-order-user {
@@ -1682,10 +1436,10 @@
 .pr-reorder-search-bar {
   display: flex;
   align-items: center;
-  gap: var(--pr-space-3);
-  margin-top: var(--pr-space-3);
-  padding-top: var(--pr-space-3);
-  border-top: 1px solid var(--pr-color-border-default);
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d0d7de;
 }
 
 .pr-reorder-search-container {
@@ -1697,25 +1451,28 @@
 
 .pr-reorder-search-input {
   width: 100%;
-  padding: var(--pr-space-2) 32px var(--pr-space-2) var(--pr-space-3);
+  padding: 6px 32px 6px 12px;
   font-size: 14px;
   line-height: 20px;
-  color: var(--pr-color-text-primary);
-  background-color: var(--pr-color-bg-primary);
-  border: 1px solid var(--pr-color-border-default);
-  border-radius: var(--pr-radius-medium);
-  box-shadow: inset 0 1px 2px rgba(27, 31, 36, 0.05);
-  transition:
-    border-color var(--pr-duration-normal) var(--pr-ease-out),
-    box-shadow var(--pr-duration-normal) var(--pr-ease-out);
+  color: #24292f;
+  background-color: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  transition: border-color 0.2s;
 }
 
+/* Task 13.6: Focus indicator for search input with enhanced visibility */
 .pr-reorder-search-input:focus {
   outline: none;
-  border-color: var(--pr-color-accent-emphasis);
-  box-shadow:
-    0 0 0 3px rgba(9, 105, 218, 0.1),
-    inset 0 1px 2px rgba(27, 31, 36, 0.05);
+  border-color: var(--pr-color-focus, #0969da);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-search-input:focus {
+    border-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.4);
+  }
 }
 
 .pr-reorder-search-input::placeholder {
@@ -1738,26 +1495,13 @@
 }
 
 .pr-reorder-search-clear:hover {
-  color: var(--pr-color-text-primary);
-  transform: scale(1.1);
-}
-
-.pr-reorder-search-clear:active {
-  transform: scale(0.9);
+  color: #24292f;
 }
 
 .pr-reorder-file-count {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--pr-color-text-secondary);
+  color: #656d76;
   white-space: nowrap;
-  transition: color var(--pr-duration-fast) var(--pr-ease-out);
-}
-
-/* Filtered count indicator - when search is active */
-.pr-reorder-file-count.filtered {
-  color: var(--pr-color-accent-emphasis);
-  font-weight: 600;
 }
 
 /* Search highlighting */
@@ -1911,5 +1655,137 @@
     box-shadow:
       0 0 0 4px rgba(88, 166, 255, 0.6),
       0 0 0 8px rgba(88, 166, 255, 0.2);
+  }
+}
+
+/* === Responsive Design (Tasks 16.1-16.7) === */
+/* Task 16.1: Media query for screens < 600px */
+@media (max-width: 599px) {
+  /* Task 16.2: Reduce modal padding at narrow width */
+  .pr-reorder-modal {
+    padding: 16px;
+    width: 95%;
+    max-width: none;
+  }
+
+  .pr-reorder-modal-header {
+    padding: 16px;
+  }
+
+  .pr-reorder-modal-body {
+    padding: 16px;
+  }
+
+  /* Task 16.3: Stack footer buttons vertically at narrow width */
+  .pr-reorder-modal-footer {
+    flex-direction: column;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .pr-reorder-modal-footer button {
+    width: 100%;
+  }
+
+  /* Task 16.4: Reduce file item height at narrow width */
+  .pr-reorder-file-item {
+    min-height: 40px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* Task 16.5: Reduce font sizes at narrow width */
+  .pr-reorder-file-path {
+    font-size: 13px;
+  }
+
+  .pr-reorder-file-changes {
+    font-size: 11px;
+  }
+
+  .pr-reorder-modal-title {
+    font-size: 16px;
+  }
+
+  /* Task 16.6: Ensure file paths wrap gracefully */
+  .pr-reorder-file-path {
+    white-space: normal;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+
+  /* Reduce search input size */
+  .pr-reorder-search-input {
+    font-size: 13px;
+    padding: 5px 28px 5px 10px;
+  }
+
+  /* Reduce preset bar padding */
+  .pr-reorder-preset-bar {
+    padding: 12px 16px;
+  }
+
+  /* Stack search and file count on narrow screens */
+  .pr-reorder-search-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pr-reorder-file-count {
+    text-align: left;
+    margin-top: 4px;
+  }
+}
+
+/* === Reduced Motion Support (Tasks 17.1-17.5) === */
+/* Task 17.1: Prefers-reduced-motion media query */
+@media (prefers-reduced-motion: reduce) {
+  /* Task 17.2, 17.3: Disable or reduce all animations */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Remove modal animations */
+  .pr-reorder-modal-entering,
+  .pr-reorder-modal-exiting {
+    animation: none;
+  }
+
+  /* Remove drag animations */
+  .pr-reorder-file-item.dragging {
+    transform: none;
+    transition: none;
+  }
+
+  .pr-reorder-file-item.drag-over {
+    transition: none;
+  }
+
+  /* Remove notification animations */
+  .pr-reorder-toast {
+    animation: none;
+  }
+
+  /* Remove loading spinner animations */
+  .pr-reorder-spinner {
+    animation: none;
+  }
+
+  /* Remove hover transitions */
+  .pr-reorder-file-item:hover,
+  .pr-reorder-btn:hover,
+  .pr-reorder-btn:active {
+    transition: none;
+  }
+
+  /* Task 17.4: All functionality works identically without animations */
+  /* Instant state changes */
+  .pr-reorder-modal-overlay {
+    animation: none;
   }
 }

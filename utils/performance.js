@@ -111,10 +111,7 @@ export function lazyLoad(items, renderFn, options = {}) {
  * @returns {*} Function result
  */
 export async function measure(label, fn) {
-  const start = performance.now();
   const result = await fn();
-  const duration = performance.now() - start;
-  console.log(`[PR-Reorder] ${label}: ${duration.toFixed(2)}ms`);
   return result;
 }
 

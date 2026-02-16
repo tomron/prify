@@ -43,7 +43,6 @@ export async function loadExtension() {
     }
   } catch (error) {
     // Extension may not have background page, which is fine
-    console.log('No service worker found for extension');
   }
 
   return { context, extensionId };

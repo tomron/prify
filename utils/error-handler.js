@@ -34,7 +34,6 @@ export function showNotification(message, type = 'info', duration = 5000) {
 
   const icon = document.createElement('div');
   icon.className = 'pr-reorder-toast-icon';
-  // SECURITY: innerHTML used only for static SVG icons (safe)
   icon.innerHTML = getIconSVG(type);
 
   const messageEl = document.createElement('div');
@@ -265,7 +264,6 @@ export function safeQuerySelector(selector, parent = document) {
   try {
     return parent.querySelector(selector);
   } catch (error) {
-    console.warn('[PR-Reorder] Invalid selector:', selector, error);
     return null;
   }
 }
@@ -288,9 +286,6 @@ export async function retry(fn, options = {}) {
     } catch (error) {
       lastError = error;
       if (i < maxRetries - 1) {
-        console.log(
-          `[PR-Reorder] Retry ${i + 1}/${maxRetries} after ${delay}ms`
-        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
