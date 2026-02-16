@@ -209,7 +209,20 @@ export function extractFiles(container) {
               el.id.includes('filter') ||
               el.id.includes('placeholder'));
 
-          return isLongHash && !isContainer;
+          // Also check if it has a nested data-file-path (new GitHub structure)
+          const hasFilePath = !!el.querySelector('[data-file-path]');
+
+          return (isLongHash && !isContainer) || hasFilePath;
+        });
+
+        // Deduplicate by ID (GitHub sometimes has duplicate elements)
+        const seen = new Set();
+        files = files.filter((el) => {
+          if (seen.has(el.id)) {
+            return false;
+          }
+          seen.add(el.id);
+          return true;
         });
       }
 
@@ -265,17 +278,34 @@ export function getFilePath(fileElement) {
       return fileElement.dataset.filePath;
     }
 
+    // NEW: Try to find nested element with data-file-path (GitHub's current structure)
+    const nestedElement = fileElement.querySelector('[data-file-path]');
+    if (nestedElement && nestedElement.dataset && nestedElement.dataset.filePath) {
+      return nestedElement.dataset.filePath;
+    }
+
     // Try to extract from heading (new GitHub - most common)
-    const heading = fileElement.querySelector('h2, h3, [role="heading"]');
-    if (heading && heading.textContent) {
-      // Remove directional marks and trim
-      const path = heading.textContent
-        .replace(/[\u200E\u200F]/g, '') // Remove LTR/RTL marks
-        .trim();
-      if (path && !path.includes('\n')) {
-        // Valid single-line path
+    const heading = fileElement.querySelector(
+      'h2, h3, [role="heading"], .file-header [data-path]'
+    );
+    if (heading) {
+      // First try data-path on the heading itself
+      if (heading.dataset && heading.dataset.path) {
         parserStats.fallbacksUsed++;
-        return path;
+        return heading.dataset.path;
+      }
+
+      // Then try textContent
+      if (heading.textContent) {
+        // Remove directional marks and trim
+        const path = heading.textContent
+          .replace(/[\u200E\u200F]/g, '') // Remove LTR/RTL marks
+          .trim();
+        if (path && !path.includes('\n')) {
+          // Valid single-line path
+          parserStats.fallbacksUsed++;
+          return path;
+        }
       }
     }
 
@@ -293,6 +323,32 @@ export function getFilePath(fileElement) {
     if (fileInfo && fileInfo.textContent) {
       parserStats.fallbacksUsed++;
       return fileInfo.textContent.trim();
+    }
+
+    // Try to find any anchor with a path-like href or title
+    const anchors = fileElement.querySelectorAll('a');
+    for (const anchor of anchors) {
+      // Check title attribute
+      if (anchor.title && anchor.title.includes('/')) {
+        parserStats.fallbacksUsed++;
+        return anchor.title.trim();
+      }
+      // Check href for file paths
+      if (anchor.href && anchor.href.includes('/blob/') || anchor.href.includes('/files/')) {
+        const match = anchor.href.match(/\/(?:blob|files)\/[^/]+\/(.+?)(?:[?#]|$)/);
+        if (match && match[1]) {
+          parserStats.fallbacksUsed++;
+          return decodeURIComponent(match[1]);
+        }
+      }
+      // Check text content if it looks like a file path
+      if (anchor.textContent) {
+        const text = anchor.textContent.trim();
+        if (text.includes('/') && !text.includes('\n') && text.length > 0 && text.length < 500) {
+          parserStats.fallbacksUsed++;
+          return text;
+        }
+      }
     }
 
     // Try other common selectors
@@ -400,5 +456,7 @@ export function getFileMetadata(fileElement) {
  */
 export function extractAllFilesMetadata(container) {
   const files = extractFiles(container);
-  return files.map((file) => getFileMetadata(file));
+  return files
+    .map((file) => getFileMetadata(file))
+    .filter((metadata) => metadata.path); // Filter out files without valid paths
 }

@@ -44,6 +44,79 @@ export function createReorderModal(options = {}) {
   const body = createModalBody();
   const footer = createModalFooter();
 
+  // Create ARIA live regions for announcements
+  const ariaLivePolite = createAriaLiveRegion('polite');
+  const ariaLiveAssertive = createAriaLiveRegion('assertive');
+  modal.appendChild(ariaLivePolite);
+  modal.appendChild(ariaLiveAssertive);
+
+  // Handle edge case: no files in PR
+  if (filesMetadata.length === 0) {
+    const emptyState = createEmptyState({
+      icon: '📄',
+      title: 'No files to reorder',
+      message: 'This PR has no changed files',
+      variant: '',
+    });
+
+    // Create empty file list container
+    const fileList = document.createElement('div');
+    fileList.appendChild(emptyState);
+
+    // Assemble modal with empty state
+    body.appendChild(fileList);
+    modal.appendChild(header);
+    modal.appendChild(presetBar);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+
+    // Disable save button
+    const saveBtn = footer.querySelector('[data-action="save"]');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.setAttribute('aria-disabled', 'true');
+    }
+
+    // Setup close handlers
+    const closeBtn = header.querySelector('.pr-reorder-modal-close');
+    const cancelBtn = footer.querySelector('[data-action="cancel"]');
+
+    const triggerButton = document.activeElement;
+    const close = () => {
+      modal.classList.add('pr-reorder-modal-exiting');
+      setTimeout(() => {
+        overlay.remove();
+        if (triggerButton && triggerButton.focus) {
+          triggerButton.focus();
+        }
+        if (onCancel) onCancel();
+      }, 200);
+    };
+
+    closeBtn.addEventListener('click', close);
+    cancelBtn.addEventListener('click', close);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        close();
+      }
+    });
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        close();
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+
+    document.body.appendChild(overlay);
+    modal.classList.add('pr-reorder-modal-entering');
+
+    return { close, getOrder: () => [] };
+  }
+
   // Create file list
   const fileList = createFileList(filesMetadata, currentOrder);
 
@@ -77,27 +150,60 @@ export function createReorderModal(options = {}) {
   const shareBtn = footer.querySelector('[data-action="share"]');
   const presetSelect = presetBar.querySelector('.pr-reorder-preset-select');
 
+  // Store reference to trigger button for focus restoration
+  const triggerButton = document.activeElement;
+
   const close = () => {
-    overlay.remove();
-    if (onCancel) onCancel();
+    // Add exit animation
+    modal.classList.add('pr-reorder-modal-exiting');
+
+    // Wait for animation to complete before removing
+    setTimeout(() => {
+      overlay.remove();
+      // Restore focus to trigger button
+      if (triggerButton && triggerButton.focus) {
+        triggerButton.focus();
+      }
+      if (onCancel) onCancel();
+    }, 200); // Match --pr-duration-normal
   };
 
   const save = () => {
     const newOrder = getOrderFromList(fileList);
-    overlay.remove();
-    if (onSave) onSave(newOrder);
+    // Add exit animation
+    modal.classList.add('pr-reorder-modal-exiting');
+
+    // Wait for animation to complete before removing
+    setTimeout(() => {
+      overlay.remove();
+      // Restore focus to trigger button
+      if (triggerButton && triggerButton.focus) {
+        triggerButton.focus();
+      }
+      if (onSave) onSave(newOrder);
+    }, 200); // Match --pr-duration-normal
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    setButtonLoading(exportBtn, true, 'Exporting...');
+
     try {
       const order = getOrderFromList(fileList);
       const prId = getPRId();
       const user = getCurrentUser();
+
+      // Simulate async operation with small delay for UX
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       downloadOrderAsJSON(order, prId, user);
       showNotification('Order exported successfully', 'success');
+      announceToScreenReader('Order exported successfully', 'polite', modal);
     } catch (error) {
       console.error('Failed to export order:', error);
       showNotification('Failed to export order', 'error');
+      announceToScreenReader('Failed to export order', 'polite', modal);
+    } finally {
+      setButtonLoading(exportBtn, false);
     }
   };
 
@@ -111,6 +217,8 @@ export function createReorderModal(options = {}) {
       const file = e.target.files[0];
       if (!file) return;
 
+      setButtonLoading(importBtn, true, 'Importing...');
+
       try {
         const text = await file.text();
         const importedData = importOrderFromJSON(text);
@@ -120,11 +228,27 @@ export function createReorderModal(options = {}) {
           .map((path) => filesMetadata.find((m) => m.path === path))
           .filter(Boolean);
 
+        // Count matches
+        const matchedCount = sortedMetadata.length;
+        const totalCount = importedData.order.length;
+
         updateFileList(fileList, sortedMetadata);
-        showNotification(`Order imported from ${importedData.user}`, 'success');
+
+        const successMessage =
+          matchedCount < totalCount
+            ? `Imported ${matchedCount} of ${totalCount} files from ${importedData.user}`
+            : `Order imported from ${importedData.user}`;
+
+        showNotification(
+          successMessage,
+          matchedCount < totalCount ? 'warning' : 'success'
+        );
+        announceToScreenReader(successMessage, 'polite', modal);
       } catch (error) {
         console.error('Failed to import order:', error);
         showNotification(`Import failed: ${error.message}`, 'error');
+      } finally {
+        setButtonLoading(importBtn, false);
       }
     });
 
@@ -132,6 +256,8 @@ export function createReorderModal(options = {}) {
   };
 
   const handleShare = async () => {
+    setButtonLoading(shareBtn, true, 'Generating...');
+
     try {
       const order = getOrderFromList(fileList);
       const prId = getPRId();
@@ -140,9 +266,21 @@ export function createReorderModal(options = {}) {
 
       await copyToClipboard(url);
       showNotification('Shareable URL copied to clipboard', 'success');
+      announceToScreenReader(
+        'Shareable URL copied to clipboard',
+        'polite',
+        modal
+      );
     } catch (error) {
       console.error('Failed to generate shareable URL:', error);
       showNotification('Failed to generate shareable URL', 'error');
+      announceToScreenReader(
+        'Failed to generate shareable URL',
+        'polite',
+        modal
+      );
+    } finally {
+      setButtonLoading(shareBtn, false);
     }
   };
 
@@ -204,11 +342,18 @@ export function createReorderModal(options = {}) {
   // Add to DOM
   document.body.appendChild(overlay);
 
-  // Focus first file item
-  const firstItem = fileList.querySelector('.pr-reorder-file-item');
-  if (firstItem) {
-    firstItem.focus();
-  }
+  // Add entering animation class
+  modal.classList.add('pr-reorder-modal-entering');
+
+  // Focus first file item after animation completes
+  setTimeout(() => {
+    const firstItem = fileList.querySelector('.pr-reorder-file-item');
+    if (firstItem) {
+      firstItem.focus();
+    }
+    // Remove entering class after animation
+    modal.classList.remove('pr-reorder-modal-entering');
+  }, 250); // Match --pr-duration-slow
 
   return {
     close,
@@ -532,6 +677,9 @@ function setupDragAndDrop(list, callbacks) {
     const item = e.target.closest('.pr-reorder-file-item');
     if (!item) return;
 
+    // Apply will-change hint for GPU acceleration
+    item.style.willChange = 'transform, opacity';
+
     item.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', item.dataset.path);
@@ -547,6 +695,11 @@ function setupDragAndDrop(list, callbacks) {
     if (!item) return;
 
     item.classList.remove('dragging');
+
+    // Remove will-change hint after animation completes
+    setTimeout(() => {
+      item.style.willChange = 'auto';
+    }, 200); // Match animation duration
 
     // Remove drag-over class from all items
     list.querySelectorAll('.drag-over').forEach((el) => {
@@ -594,7 +747,10 @@ function setupDragAndDrop(list, callbacks) {
     // Remove drag-over class
     dropTarget.classList.remove('drag-over');
 
-    // Reorder items
+    // Add drop completion animation
+    dragging.classList.add('dropping');
+
+    // Reorder items with smooth transition
     const items = Array.from(list.children);
     const dragIndex = items.indexOf(dragging);
     const dropIndex = items.indexOf(dropTarget);
@@ -604,6 +760,11 @@ function setupDragAndDrop(list, callbacks) {
     } else {
       dropTarget.before(dragging);
     }
+
+    // Remove dropping class after animation
+    setTimeout(() => {
+      dragging.classList.remove('dropping');
+    }, 200); // Match animation duration
 
     // Update aria-labels
     updateAriaLabels(list);
@@ -615,6 +776,9 @@ function setupDragAndDrop(list, callbacks) {
  * @param {HTMLElement} list - File list element
  */
 function setupKeyboardNavigation(list) {
+  // Get modal for ARIA announcements
+  const modal = list.closest('.pr-reorder-modal');
+
   list.addEventListener('keydown', (e) => {
     const item = e.target.closest('.pr-reorder-file-item');
     if (!item) return;
@@ -623,6 +787,7 @@ function setupKeyboardNavigation(list) {
     const index = items.indexOf(item);
 
     let handled = false;
+    let newPosition = null;
 
     // Move up (Ctrl+↑ or Cmd+↑)
     if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') {
@@ -630,6 +795,7 @@ function setupKeyboardNavigation(list) {
         items[index - 1].before(item);
         item.focus();
         updateAriaLabels(list);
+        newPosition = index; // New position (0-indexed)
         handled = true;
       }
     }
@@ -640,8 +806,18 @@ function setupKeyboardNavigation(list) {
         items[index + 1].after(item);
         item.focus();
         updateAriaLabels(list);
+        newPosition = index + 2; // New position (0-indexed)
         handled = true;
       }
+    }
+
+    // Announce position change to screen readers
+    if (newPosition !== null && modal) {
+      announceToScreenReader(
+        `Moved to position ${newPosition} of ${items.length}`,
+        'assertive',
+        modal
+      );
     }
 
     // Navigate up (↑)
@@ -721,6 +897,102 @@ function updateFileList(list, filesMetadata, search = '') {
 }
 
 /**
+ * Create ARIA live region for announcements
+ * @param {string} priority - 'polite' or 'assertive'
+ * @returns {HTMLElement} Live region element
+ */
+function createAriaLiveRegion(priority = 'polite') {
+  const region = document.createElement('div');
+  region.setAttribute('role', 'status');
+  region.setAttribute('aria-live', priority);
+  region.setAttribute('aria-atomic', 'true');
+  region.className = 'pr-reorder-sr-only';
+  return region;
+}
+
+/**
+ * Announce message to screen readers
+ * @param {string} message - Message to announce
+ * @param {string} priority - 'polite' or 'assertive'
+ * @param {HTMLElement} modal - Modal element containing live regions
+ */
+function announceToScreenReader(message, priority = 'polite', modal) {
+  const region = modal.querySelector(`[aria-live="${priority}"]`);
+  if (!region) return;
+
+  // Clear and set new message
+  region.textContent = '';
+  setTimeout(() => {
+    region.textContent = message;
+  }, 100); // Small delay to ensure screen readers pick up the change
+}
+
+/**
+ * Set button loading state
+ * @param {HTMLElement} button - Button element
+ * @param {boolean} isLoading - Loading state
+ * @param {string} loadingText - Text to show while loading
+ */
+function setButtonLoading(button, isLoading, loadingText = 'Loading...') {
+  if (isLoading) {
+    // Store original content
+    button.dataset.originalText = button.textContent;
+    button.dataset.originalHTML = button.innerHTML;
+
+    // Create spinner
+    const spinner = document.createElement('span');
+    spinner.className = 'pr-reorder-spinner pr-reorder-spinner-dark';
+    spinner.style.marginRight = '8px';
+
+    // Set loading state
+    button.innerHTML = '';
+    button.appendChild(spinner);
+    button.appendChild(document.createTextNode(loadingText));
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+  } else {
+    // Restore original content
+    if (button.dataset.originalHTML) {
+      button.innerHTML = button.dataset.originalHTML;
+      delete button.dataset.originalHTML;
+      delete button.dataset.originalText;
+    }
+    button.disabled = false;
+    button.removeAttribute('aria-busy');
+  }
+}
+
+/**
+ * Create empty state element
+ * @param {Object} options - Empty state options
+ * @returns {HTMLElement} Empty state element
+ */
+function createEmptyState(options) {
+  const { icon = '📁', title, message, variant = '' } = options;
+
+  const container = document.createElement('div');
+  container.className = `pr-reorder-empty-state ${variant}`;
+
+  const iconEl = document.createElement('div');
+  iconEl.className = 'pr-reorder-empty-state-icon';
+  iconEl.textContent = icon;
+
+  const titleEl = document.createElement('h3');
+  titleEl.className = 'pr-reorder-empty-state-title';
+  titleEl.textContent = title;
+
+  const messageEl = document.createElement('p');
+  messageEl.className = 'pr-reorder-empty-state-message';
+  messageEl.textContent = message;
+
+  container.appendChild(iconEl);
+  container.appendChild(titleEl);
+  container.appendChild(messageEl);
+
+  return container;
+}
+
+/**
  * Setup search handlers for filtering files
  * @param {HTMLElement} header - Modal header containing search bar
  * @param {HTMLElement} fileList - File list element
@@ -734,9 +1006,25 @@ function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
 
   if (!searchInput || !clearBtn || !fileCount) return;
 
+  // Get modal element for ARIA announcements
+  const modal = header.closest('.pr-reorder-modal');
+
   // Update file count display
   const updateFileCount = (filtered, total) => {
-    fileCount.textContent = getFileCountMessage(filtered, total);
+    const message = getFileCountMessage(filtered, total);
+    fileCount.textContent = message;
+
+    // Add "filtered" class when search is active and count differs
+    if (filtered < total) {
+      fileCount.classList.add('filtered');
+    } else {
+      fileCount.classList.remove('filtered');
+    }
+
+    // Announce to screen readers
+    if (modal) {
+      announceToScreenReader(message, 'polite', modal);
+    }
   };
 
   // Initialize file count
@@ -744,7 +1032,6 @@ function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
 
   // Filter and update file list
   const applyFilter = (search) => {
-
     if (!search) {
       // Show all files in current order
       const sortedMetadata = currentOrder
@@ -762,10 +1049,29 @@ function setupSearchHandlers(header, fileList, filesMetadata, currentOrder) {
       .map((path) => filesMetadata.find((m) => m.path === path))
       .filter(Boolean);
 
+    // Show empty state if no results
+    if (filteredMetadata.length === 0) {
+      const emptyState = createEmptyState({
+        icon: '🔍',
+        title: 'No files match your search',
+        message: 'Try a different search term',
+        variant: 'pr-reorder-empty-state-search',
+      });
+      // Clear file list safely using DOM methods
+      while (fileList.firstChild) {
+        fileList.firstChild.remove();
+      }
+      fileList.appendChild(emptyState);
+      updateFileCount(0, filesMetadata.length);
+      clearBtn.style.display = 'block';
+      return;
+    }
+
     // Update display
     updateFileList(fileList, filteredMetadata, search);
     updateFileCount(filtered.length, filesMetadata.length);
-    clearBtn.style.display = filtered.length === filesMetadata.length ? 'none' : 'block';
+    clearBtn.style.display =
+      filtered.length === filesMetadata.length ? 'none' : 'block';
   };
 
   // Handle search input

@@ -34,6 +34,7 @@ export function showNotification(message, type = 'info', duration = 5000) {
 
   const icon = document.createElement('div');
   icon.className = 'pr-reorder-toast-icon';
+  // SECURITY: innerHTML used only for static SVG icons (safe)
   icon.innerHTML = getIconSVG(type);
 
   const messageEl = document.createElement('div');

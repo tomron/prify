@@ -3,7 +3,10 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { calculateOrderDiff, formatPositionChange } from '../../utils/order-diff.js';
+import {
+  calculateOrderDiff,
+  formatPositionChange,
+} from '../../utils/order-diff.js';
 
 describe('calculateOrderDiff', () => {
   it('returns empty diff for identical orders', () => {
@@ -31,7 +34,7 @@ describe('calculateOrderDiff', () => {
       toIndex: 1,
       direction: 'down',
       distance: 1,
-      isLargeMove: false
+      isLargeMove: false,
     });
     expect(diff.moved).toContainEqual({
       file: 'b.js',
@@ -39,7 +42,7 @@ describe('calculateOrderDiff', () => {
       toIndex: 0,
       direction: 'up',
       distance: -1,
-      isLargeMove: false
+      isLargeMove: false,
     });
   });
 
@@ -53,7 +56,7 @@ describe('calculateOrderDiff', () => {
 
     const diff = calculateOrderDiff(orderA, orderB);
 
-    const movedFile = diff.moved.find(m => m.file === 'file0.js');
+    const movedFile = diff.moved.find((m) => m.file === 'file0.js');
     expect(movedFile).toBeDefined();
     expect(movedFile.distance).toBe(15);
     expect(movedFile.direction).toBe('down');
