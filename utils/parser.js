@@ -128,9 +128,6 @@ export function getFilesContainer(container) {
         if (i > 0) {
           // Used a fallback selector
           parserStats.fallbacksUsed++;
-          console.log(
-            `[PR-Reorder Parser] Used fallback selector: ${selector}`
-          );
         }
         parserStats.successfulExtractions++;
         return element;
@@ -144,7 +141,6 @@ export function getFilesContainer(container) {
       bodyElement.querySelector('.file, [data-file-type], [data-path]')
     ) {
       parserStats.fallbacksUsed++;
-      console.log('[PR-Reorder Parser] Using body as fallback container');
       parserStats.successfulExtractions++;
       return bodyElement;
     }
@@ -217,9 +213,6 @@ export function extractFiles(container) {
         if (i > 0) {
           // Used a fallback selector
           parserStats.fallbacksUsed++;
-          console.log(
-            `[PR-Reorder Parser] Used fallback file selector: ${selector} (${files.length} files)`
-          );
         }
         parserStats.successfulExtractions++;
         return files;

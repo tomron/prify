@@ -176,10 +176,6 @@ export function checkRateLimit() {
   if (lastPost) {
     const timeSincePost = Date.now() - parseInt(lastPost, 10);
     if (timeSincePost < RATE_LIMIT_MS) {
-      const waitTime = Math.ceil((RATE_LIMIT_MS - timeSincePost) / 1000);
-      console.warn(
-        `[PR-Reorder] Rate limited. Wait ${waitTime}s before posting again.`
-      );
       return false;
     }
   }
@@ -196,7 +192,6 @@ export function checkRateLimit() {
  */
 export async function postOrderComment(order, metadata = {}) {
   if (!hasWritePermission()) {
-    console.warn('[PR-Reorder] No write permission, cannot post comment');
     return false;
   }
 
@@ -256,7 +251,6 @@ function checkCommentPosted(_commentText) {
 export function watchForNewComments(callback) {
   const timeline = document.querySelector('.js-discussion');
   if (!timeline) {
-    console.warn('[PR-Reorder] Discussion timeline not found');
     return null;
   }
 
@@ -300,7 +294,6 @@ export function stopWatching(observer) {
 export async function loadAllOrders() {
   const prId = getPRId();
   if (!prId) {
-    console.warn('[PR-Reorder] Cannot determine PR ID');
     return [];
   }
 
@@ -349,7 +342,6 @@ export async function saveOrderEverywhere(order, options = {}) {
 
   const prId = getPRId();
   if (!prId) {
-    console.warn('[PR-Reorder] Cannot determine PR ID');
     return false;
   }
 

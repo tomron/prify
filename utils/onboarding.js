@@ -56,7 +56,7 @@ export function getTourSteps() {
     {
       title: 'Welcome to PR File Reorder!',
       content:
-        'This extension helps you and your team organize file order in GitHub PRs for better code reviews. Let\'s take a quick tour!',
+        "This extension helps you and your team organize file order in GitHub PRs for better code reviews. Let's take a quick tour!",
       target: null, // Center overlay
       placement: 'center',
     },
@@ -84,12 +84,12 @@ export function getTourSteps() {
     {
       title: 'Collaborate with Your Team',
       content:
-        'Your order is saved and shared with your team. View everyone\'s suggested orders and see the consensus!',
+        "Your order is saved and shared with your team. View everyone's suggested orders and see the consensus!",
       target: '.pr-viewer-trigger-btn',
       placement: 'bottom',
     },
     {
-      title: 'You\'re All Set!',
+      title: "You're All Set!",
       content:
         'Start reordering files to improve your code review experience. Need help? Check the documentation or contact support.',
       target: null,

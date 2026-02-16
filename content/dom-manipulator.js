@@ -92,13 +92,11 @@ export function reorderFiles(order, container) {
 
   const filesContainer = getFilesContainer(container);
   if (!filesContainer) {
-    console.warn('[PR-Reorder] Files container not found');
     return;
   }
 
   const files = extractFiles(container);
   if (files.length === 0) {
-    console.warn('[PR-Reorder] No files found to reorder');
     return;
   }
 
@@ -190,13 +188,11 @@ export function reorderFiles(order, container) {
 export function observeFileChanges(callback, debounceMs = 300) {
   // Don't create multiple observers
   if (observer) {
-    console.warn('[PR-Reorder] Already observing file changes');
     return null;
   }
 
   const filesContainer = getFilesContainer();
   if (!filesContainer) {
-    console.warn('[PR-Reorder] Cannot observe: files container not found');
     return null;
   }
 
@@ -277,7 +273,6 @@ export function reapplySavedOrder(savedOrder, container) {
     const validation = validateFileOrder(savedOrder, container);
 
     if (!validation.valid) {
-      console.warn('[PR-Reorder] Cannot reapply order:', validation.errors);
       return false;
     }
 

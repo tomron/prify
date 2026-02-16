@@ -35,7 +35,6 @@ let currentConsensusOrder = null; // BUG-001: Store order for re-application
 async function init() {
   // BUG-002: Clean up any previous initialization before reinitializing
   if (extensionLoaded) {
-    console.log('[PR-Reorder] Cleaning up previous initialization...');
     cleanup();
     extensionLoaded = false;
     buttonsInjected = false;
@@ -47,19 +46,13 @@ async function init() {
   // Verify we're on a PR page
   const prId = getPRId();
   if (!prId) {
-    console.log('[PR-Reorder] Not a PR page, skipping initialization');
     return;
   }
 
   // Check if we're on the Files tab
   if (!isOnFilesTab()) {
-    console.log(
-      '[PR-Reorder] Not on Files tab yet. Extension will activate when you navigate to Files.'
-    );
     return;
   }
-
-  console.log('[PR-Reorder] Initializing on PR:', prId);
 
   // Inject buttons
   injectButtons();
@@ -70,8 +63,6 @@ async function init() {
   // Mark as loaded
   extensionLoaded = true;
   document.documentElement.setAttribute('data-pr-reorder', 'loaded');
-
-  console.log('[PR-Reorder] Extension initialized');
 
   // Show onboarding tour for first-time users
   initializeOnboarding();
@@ -87,12 +78,8 @@ async function initializeOnboarding() {
       // Wait a bit for UI to settle before showing tour
       setTimeout(() => {
         createOnboardingTour({
-          onComplete: () => {
-            console.log('[PR-Reorder] Onboarding tour completed');
-          },
-          onSkip: () => {
-            console.log('[PR-Reorder] Onboarding tour skipped');
-          },
+          onComplete: () => {},
+          onSkip: () => {},
         });
       }, 1000);
     }
@@ -121,21 +108,15 @@ function injectButtons() {
     const count = document.querySelectorAll(selector).length;
     if (count > 0) {
       filesExist = true;
-      console.log(
-        `[PR-Reorder] Found ${count} files using selector: ${selector}`
-      );
       break;
     }
   }
 
   if (!filesExist) {
-    console.log('[PR-Reorder] Files not loaded yet, waiting...');
     const manager = getCleanupManager();
     manager.trackTimeout(injectButtons, 500);
     return;
   }
-
-  console.log('[PR-Reorder] Files detected, finding injection point...');
 
   // Find the file header (where "Files changed" is)
   // Try multiple selectors for GitHub's evolving DOM structure
@@ -158,28 +139,12 @@ function injectButtons() {
       fileHeader = element;
       if (i > 0) {
         usedFallback = true;
-        console.log(`[PR-Reorder] Used fallback selector: ${selectors[i]}`);
       }
       break;
     }
   }
 
   if (!fileHeader) {
-    console.warn(
-      '[PR-Reorder] Could not find file header with any selector. Tried:',
-      selectors
-    );
-    console.warn(
-      '[PR-Reorder] Available elements:',
-      'files:',
-      !!document.querySelector('#files'),
-      'files_bucket:',
-      !!document.querySelector('#files_bucket'),
-      'data-hpc:',
-      !!document.querySelector('[data-hpc]'),
-      'files with [data-path]:',
-      document.querySelectorAll('[data-path]').length
-    );
     // BUG-002: Track timeout for cleanup
     const manager = getCleanupManager();
     manager.trackTimeout(injectButtons, 1000);
@@ -223,33 +188,26 @@ function injectButtons() {
     container.style.cssText =
       'display: flex; gap: 8px; padding: 16px; border-bottom: 1px solid #d0d7de; background: #f6f8fa; position: sticky; top: 0; z-index: 100;';
     fileHeader.insertBefore(container, fileHeader.firstChild);
-    console.log('[PR-Reorder] Injected into container (prepended)');
   } else {
     // Normal injection for proper header locations
     fileHeader.appendChild(container);
-    console.log('[PR-Reorder] Injected into header (appended)');
   }
 
   // BUG-002: Track injected element
   manager.trackElement(container);
 
   buttonsInjected = true;
-  console.log('[PR-Reorder] Buttons injected');
 }
 
 /**
  * Handle Reorder button click
  */
 function handleReorderClick() {
-  console.log('[PR-Reorder] Opening reorder modal');
-
   const currentOrder = getCurrentOrder();
 
   createReorderModal({
     initialOrder: currentOrder,
     onSave: async (newOrder) => {
-      console.log('[PR-Reorder] Saving new order:', newOrder);
-
       // Apply to DOM
       reorderFiles(newOrder);
 
@@ -266,12 +224,8 @@ function handleReorderClick() {
           },
         });
       }
-
-      console.log('[PR-Reorder] Order saved and applied');
     },
-    onCancel: () => {
-      console.log('[PR-Reorder] Reorder cancelled');
-    },
+    onCancel: () => {},
   });
 }
 
@@ -279,8 +233,6 @@ function handleReorderClick() {
  * Handle View Orders button click
  */
 async function handleViewOrdersClick() {
-  console.log('[PR-Reorder] Opening order viewer');
-
   try {
     // Load all orders
     const orders = await loadAllOrders();
@@ -289,24 +241,15 @@ async function handleViewOrdersClick() {
     const consensus = calculateConsensus(orders, { excludeOutliers: false });
     const metadata = getConsensusMetadata(orders, consensus);
 
-    console.log('[PR-Reorder] Loaded orders:', {
-      count: orders.length,
-      agreement: metadata.agreementScore,
-      conflicts: metadata.conflicts.length,
-    });
-
     // Show modal
     createOrderViewerModal({
       orders,
       consensus,
       metadata,
       onSelectOrder: (order) => {
-        console.log('[PR-Reorder] Applying selected order');
         reorderFiles(order);
       },
-      onClose: () => {
-        console.log('[PR-Reorder] Order viewer closed');
-      },
+      onClose: () => {},
     });
   } catch (error) {
     console.error('[PR-Reorder] Failed to load orders:', error);
@@ -327,7 +270,6 @@ async function applySavedOrder() {
     const orders = await loadAllOrders();
 
     if (orders.length === 0) {
-      console.log('[PR-Reorder] No saved orders found');
       return;
     }
 
@@ -335,11 +277,6 @@ async function applySavedOrder() {
     const consensus = calculateConsensus(orders, { excludeOutliers: false });
 
     if (consensus.length > 0) {
-      console.log(
-        '[PR-Reorder] Applying consensus order from',
-        orders.length,
-        'user(s)'
-      );
       reorderFiles(consensus);
 
       // BUG-001: Store consensus for re-application when files load dynamically
@@ -366,7 +303,6 @@ function setupDynamicFileObserver() {
   // Create new observer
   const observer = observeFileChanges(() => {
     if (currentConsensusOrder && currentConsensusOrder.length > 0) {
-      console.log('[PR-Reorder] Dynamic files detected, re-applying order');
       reapplySavedOrder(currentConsensusOrder);
     }
   }, 500); // 500ms debounce for dynamic loading
@@ -398,15 +334,12 @@ function waitForPageLoad() {
  * Main entry point
  */
 async function main() {
-  console.log('[PR-Reorder] Content script loaded');
-
   // Wait for page to load
   await waitForPageLoad();
 
   // Check if we're on a PR page
   const prId = getPRId();
   if (!prId) {
-    console.log('[PR-Reorder] Not a PR page');
     return;
   }
 
@@ -426,7 +359,6 @@ function observeNavigation() {
 
   // Navigation handler
   const handleNavigation = async () => {
-    console.log('[PR-Reorder] Navigation detected, reinitializing...');
     await init();
   };
 
@@ -439,9 +371,6 @@ function observeNavigation() {
     const currentUrl = location.href;
     if (currentUrl !== lastUrl) {
       lastUrl = currentUrl;
-      console.log(
-        '[PR-Reorder] URL changed, checking if reinitialization needed...'
-      );
       // BUG-002: Track timeout for cleanup
       manager.trackTimeout(init, 500);
     }

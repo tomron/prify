@@ -91,7 +91,7 @@ function escapeHtml(text) {
 export function filterFiles(files, search) {
   if (!search) return files;
 
-  return files.filter(file => fuzzyMatch(search, file));
+  return files.filter((file) => fuzzyMatch(search, file));
 }
 
 /**

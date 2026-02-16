@@ -264,7 +264,6 @@ export function safeQuerySelector(selector, parent = document) {
   try {
     return parent.querySelector(selector);
   } catch (error) {
-    console.warn('[PR-Reorder] Invalid selector:', selector, error);
     return null;
   }
 }
@@ -287,9 +286,6 @@ export async function retry(fn, options = {}) {
     } catch (error) {
       lastError = error;
       if (i < maxRetries - 1) {
-        console.log(
-          `[PR-Reorder] Retry ${i + 1}/${maxRetries} after ${delay}ms`
-        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }

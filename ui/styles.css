@@ -69,6 +69,25 @@
   background-color: #a40e26;
 }
 
+/* Task 13.5: Focus ring styles for buttons */
+.pr-reorder-btn:focus {
+  outline: 2px solid var(--pr-color-focus, #0969da);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+}
+
+.pr-reorder-btn:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-btn:focus {
+    outline-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.4);
+  }
+}
+
 /* === Modal === */
 .pr-reorder-modal-overlay {
   position: fixed;
@@ -179,10 +198,10 @@
 .pr-reorder-file-item {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 8px 10px;
   border: 1px solid #d0d7de;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
   background-color: #ffffff;
   cursor: move;
   transition: all 0.2s;
@@ -203,10 +222,53 @@
   background-color: #dafbe1;
 }
 
+/* Task 13.1, 13.2, 13.3: Focus indicators for file items */
+.pr-reorder-file-item:focus {
+  outline: 3px solid var(--pr-color-focus, #0969da);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 3px rgba(9, 105, 218, 0.3),
+    0 1px 0 rgba(27, 31, 36, 0.1);
+}
+
+/* Task 13.4: Ensure focus indicators work in dark mode */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-file-item:focus {
+    outline-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow:
+      0 0 0 3px rgba(88, 166, 255, 0.4),
+      0 1px 0 rgba(240, 246, 252, 0.1);
+  }
+}
+
+/* Task 12.2: Visual indication for keyboard drag mode */
+.pr-reorder-file-item.pr-reorder-drag-mode {
+  background-color: #ddf4ff;
+  border-color: #0969da;
+  border-width: 2px;
+  box-shadow:
+    0 0 0 3px rgba(9, 105, 218, 0.2),
+    0 2px 8px rgba(9, 105, 218, 0.15);
+  outline: 3px solid #0969da;
+  outline-offset: 2px;
+}
+
+/* Dark mode drag mode indication */
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-file-item.pr-reorder-drag-mode {
+    background-color: #1a2f3a;
+    border-color: #58a6ff;
+    box-shadow:
+      0 0 0 3px rgba(88, 166, 255, 0.3),
+      0 2px 8px rgba(88, 166, 255, 0.2);
+    outline-color: #58a6ff;
+  }
+}
+
 .pr-reorder-file-handle {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
   color: #57606a;
   flex-shrink: 0;
 }
@@ -216,7 +278,7 @@
   font-family:
     ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono',
     monospace;
-  font-size: 13px;
+  font-size: 12px;
   color: #24292f;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -224,8 +286,8 @@
 }
 
 .pr-reorder-file-changes {
-  margin-left: 12px;
-  font-size: 12px;
+  margin-left: 8px;
+  font-size: 11px;
   color: #57606a;
 }
 
@@ -1243,7 +1305,14 @@
 
 .pr-diff-file-path {
   flex-grow: 1;
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    SF Mono,
+    Menlo,
+    Consolas,
+    Liberation Mono,
+    monospace;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1392,10 +1461,18 @@
   transition: border-color 0.2s;
 }
 
+/* Task 13.6: Focus indicator for search input with enhanced visibility */
 .pr-reorder-search-input:focus {
   outline: none;
-  border-color: #0969da;
-  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1);
+  border-color: var(--pr-color-focus, #0969da);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pr-reorder-search-input:focus {
+    border-color: var(--pr-color-focus-dark, #58a6ff);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.4);
+  }
 }
 
 .pr-reorder-search-input::placeholder {
@@ -1548,7 +1625,9 @@
 .pr-tour-highlight {
   position: relative;
   z-index: 999998;
-  box-shadow: 0 0 0 4px rgba(9, 105, 218, 0.6), 0 0 0 8px rgba(9, 105, 218, 0.2);
+  box-shadow:
+    0 0 0 4px rgba(9, 105, 218, 0.6),
+    0 0 0 8px rgba(9, 105, 218, 0.2);
   border-radius: 6px;
   transition: box-shadow 0.3s ease;
 }
@@ -1573,6 +1652,140 @@
   }
 
   .pr-tour-highlight {
-    box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.6), 0 0 0 8px rgba(88, 166, 255, 0.2);
+    box-shadow:
+      0 0 0 4px rgba(88, 166, 255, 0.6),
+      0 0 0 8px rgba(88, 166, 255, 0.2);
+  }
+}
+
+/* === Responsive Design (Tasks 16.1-16.7) === */
+/* Task 16.1: Media query for screens < 600px */
+@media (max-width: 599px) {
+  /* Task 16.2: Reduce modal padding at narrow width */
+  .pr-reorder-modal {
+    padding: 16px;
+    width: 95%;
+    max-width: none;
+  }
+
+  .pr-reorder-modal-header {
+    padding: 16px;
+  }
+
+  .pr-reorder-modal-body {
+    padding: 16px;
+  }
+
+  /* Task 16.3: Stack footer buttons vertically at narrow width */
+  .pr-reorder-modal-footer {
+    flex-direction: column;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .pr-reorder-modal-footer button {
+    width: 100%;
+  }
+
+  /* Task 16.4: Reduce file item height at narrow width */
+  .pr-reorder-file-item {
+    min-height: 40px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+
+  /* Task 16.5: Reduce font sizes at narrow width */
+  .pr-reorder-file-path {
+    font-size: 13px;
+  }
+
+  .pr-reorder-file-changes {
+    font-size: 11px;
+  }
+
+  .pr-reorder-modal-title {
+    font-size: 16px;
+  }
+
+  /* Task 16.6: Ensure file paths wrap gracefully */
+  .pr-reorder-file-path {
+    white-space: normal;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+
+  /* Reduce search input size */
+  .pr-reorder-search-input {
+    font-size: 13px;
+    padding: 5px 28px 5px 10px;
+  }
+
+  /* Reduce preset bar padding */
+  .pr-reorder-preset-bar {
+    padding: 12px 16px;
+  }
+
+  /* Stack search and file count on narrow screens */
+  .pr-reorder-search-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pr-reorder-file-count {
+    text-align: left;
+    margin-top: 4px;
+  }
+}
+
+/* === Reduced Motion Support (Tasks 17.1-17.5) === */
+/* Task 17.1: Prefers-reduced-motion media query */
+@media (prefers-reduced-motion: reduce) {
+  /* Task 17.2, 17.3: Disable or reduce all animations */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Remove modal animations */
+  .pr-reorder-modal-entering,
+  .pr-reorder-modal-exiting {
+    animation: none;
+  }
+
+  /* Remove drag animations */
+  .pr-reorder-file-item.dragging {
+    transform: none;
+    transition: none;
+  }
+
+  .pr-reorder-file-item.drag-over {
+    transition: none;
+  }
+
+  /* Remove notification animations */
+  .pr-reorder-toast {
+    animation: none;
+  }
+
+  /* Remove loading spinner animations */
+  .pr-reorder-spinner {
+    animation: none;
+  }
+
+  /* Remove hover transitions */
+  .pr-reorder-file-item:hover,
+  .pr-reorder-btn:hover,
+  .pr-reorder-btn:active {
+    transition: none;
+  }
+
+  /* Task 17.4: All functionality works identically without animations */
+  /* Instant state changes */
+  .pr-reorder-modal-overlay {
+    animation: none;
   }
 }

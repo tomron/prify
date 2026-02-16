@@ -96,7 +96,7 @@ class CleanupManager {
       try {
         element.remove();
       } catch (error) {
-        console.warn('[PR-Reorder] Error removing element:', error);
+        // Ignore cleanup errors
       }
     }
     this.injectedElements.clear();
@@ -107,7 +107,7 @@ class CleanupManager {
         try {
           element.removeEventListener(event, handler, options);
         } catch (error) {
-          console.warn('[PR-Reorder] Error removing listener:', error);
+          // Ignore cleanup errors
         }
       }
     }
@@ -118,7 +118,7 @@ class CleanupManager {
       try {
         observer.disconnect();
       } catch (error) {
-        console.warn('[PR-Reorder] Error disconnecting observer:', error);
+        // Ignore cleanup errors
       }
     }
     this.observers = [];
@@ -140,12 +140,10 @@ class CleanupManager {
       try {
         controller.abort();
       } catch (error) {
-        console.warn('[PR-Reorder] Error aborting operation:', error);
+        // Ignore cleanup errors
       }
     }
     this.abortControllers = [];
-
-    console.log('[PR-Reorder] Cleanup complete');
   }
 
   /**

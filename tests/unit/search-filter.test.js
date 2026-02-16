@@ -3,7 +3,11 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { fuzzyMatch, highlightMatches, filterFiles } from '../../utils/search-filter.js';
+import {
+  fuzzyMatch,
+  highlightMatches,
+  filterFiles,
+} from '../../utils/search-filter.js';
 
 describe('fuzzyMatch', () => {
   it('matches exact substring', () => {
@@ -90,7 +94,7 @@ describe('filterFiles', () => {
     'src/utils/helper.js',
     'tests/unit/parser.test.js',
     'docs/api.md',
-    'package.json'
+    'package.json',
   ];
 
   it('returns all files for empty search', () => {
@@ -141,7 +145,7 @@ describe('filterFiles', () => {
     const start = performance.now();
     const result = filterFiles(largeList, 'file5');
     const duration = performance.now() - start;
-    
+
     // Should filter 1000 files in <10ms
     expect(duration).toBeLessThan(10);
     expect(result.length).toBeGreaterThan(0);
