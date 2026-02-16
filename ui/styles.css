@@ -289,12 +289,12 @@
 
 /* === Preset Bar === */
 .pr-reorder-preset-bar {
-  padding: 12px 24px;
-  border-bottom: 1px solid #d0d7de;
+  padding: var(--pr-space-3) var(--pr-space-6);
+  border-bottom: 1px solid var(--pr-color-border-default);
   display: flex;
   align-items: center;
-  gap: 12px;
-  background-color: #f6f8fa;
+  gap: var(--pr-space-3);
+  background-color: var(--pr-color-bg-secondary);
 }
 
 .pr-reorder-preset-label {
@@ -331,19 +331,19 @@
   padding: 16px 24px;
   overflow-y: auto;
   flex: 1;
-  background-color: #ffffff;
+  background-color: var(--pr-color-bg-primary);
 }
 
 .pr-reorder-modal-footer {
   padding: 16px 24px;
-  border-top: 1px solid #d0d7de;
+  border-top: 1px solid var(--pr-color-border-default);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  background-color: #ffffff;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  background-color: var(--pr-color-bg-primary);
+  border-bottom-left-radius: var(--pr-radius-large);
+  border-bottom-right-radius: var(--pr-radius-large);
 }
 
 .pr-reorder-footer-left,

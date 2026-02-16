@@ -22,7 +22,10 @@ test.describe('Extension Loading', () => {
     expect(manifest.content_scripts.length).toBeGreaterThan(0);
 
     const contentScript = manifest.content_scripts[0];
-    expect(contentScript.matches).toContain('https://github.com/*/pull/*');
+    expect(contentScript.matches).toContain('https://github.com/*/*/pull/*');
+    expect(contentScript.matches).toContain(
+      'https://github.com/*/*/pull/*/changes'
+    );
     expect(contentScript.js).toContain('dist/content.js');
   });
 

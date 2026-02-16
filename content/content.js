@@ -33,6 +33,8 @@ let currentConsensusOrder = null; // BUG-001: Store order for re-application
  * Initialize extension on GitHub PR pages
  */
 async function init() {
+  console.log('[PR-Reorder] init() called');
+
   // BUG-002: Clean up any previous initialization before reinitializing
   if (extensionLoaded) {
     console.log('[PR-Reorder] Cleaning up previous initialization...');
@@ -46,13 +48,25 @@ async function init() {
 
   // Verify we're on a PR page
   const prId = getPRId();
+  console.log('[PR-Reorder] init() - PR ID:', prId);
   if (!prId) {
     console.log('[PR-Reorder] Not a PR page, skipping initialization');
     return;
   }
 
   // Check if we're on the Files tab
-  if (!isOnFilesTab()) {
+  const onFilesTab = isOnFilesTab();
+  console.log('[PR-Reorder] init() - isOnFilesTab():', onFilesTab);
+  console.log(
+    '[PR-Reorder] init() - pathname includes /files:',
+    window.location.pathname.includes('/files')
+  );
+  console.log(
+    '[PR-Reorder] init() - pathname includes /changes:',
+    window.location.pathname.includes('/changes')
+  );
+
+  if (!onFilesTab) {
     console.log(
       '[PR-Reorder] Not on Files tab yet. Extension will activate when you navigate to Files.'
     );
@@ -399,19 +413,26 @@ function waitForPageLoad() {
  */
 async function main() {
   console.log('[PR-Reorder] Content script loaded');
+  console.log('[PR-Reorder] URL:', window.location.href);
+  console.log('[PR-Reorder] Pathname:', window.location.pathname);
 
   // Wait for page to load
+  console.log('[PR-Reorder] Waiting for page load...');
   await waitForPageLoad();
+  console.log('[PR-Reorder] Page loaded');
 
   // Check if we're on a PR page
   const prId = getPRId();
+  console.log('[PR-Reorder] PR ID:', prId);
   if (!prId) {
     console.log('[PR-Reorder] Not a PR page');
     return;
   }
 
   // Initialize extension
+  console.log('[PR-Reorder] Calling init()...');
   await init();
+  console.log('[PR-Reorder] Init complete');
 
   // Watch for navigation (GitHub uses PJAX)
   observeNavigation();

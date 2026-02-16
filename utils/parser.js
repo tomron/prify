@@ -280,7 +280,11 @@ export function getFilePath(fileElement) {
 
     // NEW: Try to find nested element with data-file-path (GitHub's current structure)
     const nestedElement = fileElement.querySelector('[data-file-path]');
-    if (nestedElement && nestedElement.dataset && nestedElement.dataset.filePath) {
+    if (
+      nestedElement &&
+      nestedElement.dataset &&
+      nestedElement.dataset.filePath
+    ) {
       return nestedElement.dataset.filePath;
     }
 
@@ -334,8 +338,13 @@ export function getFilePath(fileElement) {
         return anchor.title.trim();
       }
       // Check href for file paths
-      if (anchor.href && anchor.href.includes('/blob/') || anchor.href.includes('/files/')) {
-        const match = anchor.href.match(/\/(?:blob|files)\/[^/]+\/(.+?)(?:[?#]|$)/);
+      if (
+        (anchor.href && anchor.href.includes('/blob/')) ||
+        anchor.href.includes('/files/')
+      ) {
+        const match = anchor.href.match(
+          /\/(?:blob|files)\/[^/]+\/(.+?)(?:[?#]|$)/
+        );
         if (match && match[1]) {
           parserStats.fallbacksUsed++;
           return decodeURIComponent(match[1]);
@@ -344,7 +353,12 @@ export function getFilePath(fileElement) {
       // Check text content if it looks like a file path
       if (anchor.textContent) {
         const text = anchor.textContent.trim();
-        if (text.includes('/') && !text.includes('\n') && text.length > 0 && text.length < 500) {
+        if (
+          text.includes('/') &&
+          !text.includes('\n') &&
+          text.length > 0 &&
+          text.length < 500
+        ) {
           parserStats.fallbacksUsed++;
           return text;
         }

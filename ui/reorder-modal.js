@@ -615,9 +615,10 @@ function createFileItem(metadata, index, search = '', total = 0) {
   item.setAttribute('role', 'listitem');
 
   // Task 14.1: Include total count in aria-label
-  const ariaLabel = total > 0
-    ? `${metadata.path}, position ${index + 1} of ${total}`
-    : `${metadata.path}, position ${index + 1}`;
+  const ariaLabel =
+    total > 0
+      ? `${metadata.path}, position ${index + 1} of ${total}`
+      : `${metadata.path}, position ${index + 1}`;
   item.setAttribute('aria-label', ariaLabel);
   item.dataset.path = metadata.path;
 
