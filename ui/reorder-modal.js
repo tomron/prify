@@ -586,10 +586,11 @@ function createFileList(filesMetadata, order) {
   });
 
   // Add files in current order
+  const total = order.length;
   order.forEach((filePath, index) => {
     const metadata = metadataMap.get(filePath);
     if (metadata) {
-      const item = createFileItem(metadata, index);
+      const item = createFileItem(metadata, index, '', total);
       list.appendChild(item);
     }
   });
@@ -599,17 +600,25 @@ function createFileList(filesMetadata, order) {
 
 /**
  * Create file list item
+ * Task 14.1: Include position in aria-label ("path, position X of Y")
  * @param {Object} metadata - File metadata
  * @param {number} index - Item index
+ * @param {string} search - Search query for highlighting
+ * @param {number} total - Total number of items
  * @returns {HTMLElement}
  */
-function createFileItem(metadata, index, search = '') {
+function createFileItem(metadata, index, search = '', total = 0) {
   const item = document.createElement('li');
   item.className = 'pr-reorder-file-item';
   item.setAttribute('draggable', 'true');
   item.setAttribute('tabindex', '0');
   item.setAttribute('role', 'listitem');
-  item.setAttribute('aria-label', `${metadata.path}, position ${index + 1}`);
+
+  // Task 14.1: Include total count in aria-label
+  const ariaLabel = total > 0
+    ? `${metadata.path}, position ${index + 1} of ${total}`
+    : `${metadata.path}, position ${index + 1}`;
+  item.setAttribute('aria-label', ariaLabel);
   item.dataset.path = metadata.path;
 
   // Drag handle
@@ -846,11 +855,19 @@ function setupKeyboardNavigation(list) {
  * Update aria-labels after reordering
  * @param {HTMLElement} list - File list element
  */
+/**
+ * Update aria-labels after reordering
+ * Task 14.2: Update aria-labels to reflect new positions
+ */
 function updateAriaLabels(list) {
   const items = list.querySelectorAll('.pr-reorder-file-item');
+  const total = items.length;
   items.forEach((item, index) => {
     const path = item.dataset.path;
-    item.setAttribute('aria-label', `${path}, position ${index + 1}`);
+    item.setAttribute(
+      'aria-label',
+      `${path}, position ${index + 1} of ${total}`
+    );
   });
 }
 
@@ -875,8 +892,12 @@ function updateFileList(list, filesMetadata, search = '') {
     existingItems.set(item.dataset.path, item);
   });
 
-  // Clear the list
-  list.innerHTML = '';
+  // Clear the list (safe: no user content)
+  while (list.firstChild) {
+    list.firstChild.remove();
+  }
+
+  const total = filesMetadata.length;
 
   // Add files in new order
   filesMetadata.forEach((metadata, index) => {
@@ -885,12 +906,12 @@ function updateFileList(list, filesMetadata, search = '') {
       // Reuse existing item to preserve event listeners (only when not searching)
       existingItem.setAttribute(
         'aria-label',
-        `${metadata.path}, position ${index + 1}`
+        `${metadata.path}, position ${index + 1} of ${total}`
       );
       list.appendChild(existingItem);
     } else {
       // Create new item (or recreate when searching to apply highlighting)
-      const item = createFileItem(metadata, index, search);
+      const item = createFileItem(metadata, index, search, total);
       list.appendChild(item);
     }
   });
@@ -949,6 +970,8 @@ function setButtonLoading(button, isLoading, loadingText = 'Loading...') {
     button.appendChild(spinner);
     button.appendChild(document.createTextNode(loadingText));
     button.disabled = true;
+    // Task 14.6: Add aria-disabled to disabled buttons
+    button.setAttribute('aria-disabled', 'true');
     button.setAttribute('aria-busy', 'true');
   } else {
     // Restore original content
@@ -958,12 +981,15 @@ function setButtonLoading(button, isLoading, loadingText = 'Loading...') {
       delete button.dataset.originalText;
     }
     button.disabled = false;
+    // Task 14.6: Remove aria-disabled when enabling buttons
+    button.removeAttribute('aria-disabled');
     button.removeAttribute('aria-busy');
   }
 }
 
 /**
  * Create empty state element
+ * Task 14.7: Announce empty state messages to screen readers
  * @param {Object} options - Empty state options
  * @returns {HTMLElement} Empty state element
  */
@@ -972,10 +998,15 @@ function createEmptyState(options) {
 
   const container = document.createElement('div');
   container.className = `pr-reorder-empty-state ${variant}`;
+  // Task 14.7: Make empty state accessible to screen readers
+  container.setAttribute('role', 'status');
+  container.setAttribute('aria-live', 'polite');
 
   const iconEl = document.createElement('div');
   iconEl.className = 'pr-reorder-empty-state-icon';
   iconEl.textContent = icon;
+  // Hide decorative icon from screen readers
+  iconEl.setAttribute('aria-hidden', 'true');
 
   const titleEl = document.createElement('h3');
   titleEl.className = 'pr-reorder-empty-state-title';
