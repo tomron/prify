@@ -107,16 +107,16 @@
 
 ## 12. Accessibility - Enhanced Keyboard Navigation
 
-- [ ] 12.1 Add Enter key handler to activate "drag mode" on focused item
-- [ ] 12.2 Add visual indication for drag mode (outline, background change)
-- [ ] 12.3 Announce "Drag mode activated" to screen readers
-- [ ] 12.4 Handle arrow keys in drag mode to move item position
-- [ ] 12.5 Add Space key handler to complete drop in drag mode
-- [ ] 12.6 Announce "Dropped at position X" to screen readers
-- [ ] 12.7 Add Esc key handler to cancel drag mode
-- [ ] 12.8 Announce "Drag cancelled" to screen readers
-- [ ] 12.9 Ensure existing Ctrl/Cmd + arrow shortcuts still work
-- [ ] 12.10 Update aria-label after each position change
+- [x] 12.1 Add Enter key handler to activate "drag mode" on focused item
+- [x] 12.2 Add visual indication for drag mode (outline, background change)
+- [x] 12.3 Announce "Drag mode activated" to screen readers
+- [x] 12.4 Handle arrow keys in drag mode to move item position
+- [x] 12.5 Add Space key handler to complete drop in drag mode
+- [x] 12.6 Announce "Dropped at position X" to screen readers
+- [x] 12.7 Add Esc key handler to cancel drag mode
+- [x] 12.8 Announce "Drag cancelled" to screen readers
+- [x] 12.9 Ensure existing Ctrl/Cmd + arrow shortcuts still work
+- [x] 12.10 Update aria-label after each position change
 
 ## 13. Accessibility - Visual Focus Indicators
 
