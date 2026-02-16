@@ -1,0 +1,21 @@
+# Promotional Images Directory
+
+## Required Image
+
+- **Small Tile:** 440x280px (promo-440x280.png)
+  - Template: promo-440x280.html (open in browser and screenshot)
+  - Must show actual extension UI
+
+## Optional Images
+
+- **Marquee:** 1400x560px
+- **Large Tile:** 920x680px
+
+## Generation
+
+1. Open HTML template in browser at exact dimensions
+2. Screenshot the rendered output
+3. Save as PNG to this directory
+4. Verify image shows actual extension UI (not mockups)
+
+Templates are sourced from `icons/promo-*.html`

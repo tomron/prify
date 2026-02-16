@@ -42,7 +42,21 @@ This extension solves a real DevEx problem: GitHub's alphabetical file ordering 
 
 ### For Users
 
-_Coming soon: Chrome Web Store link_
+#### Chrome Web Store (Recommended)
+
+_Chrome Web Store link will be added here after publication._
+
+The extension will be available for one-click installation from the Chrome Web Store soon.
+
+#### Manual Installation
+
+For now, you can install manually:
+1. Download the latest release ZIP file
+2. Extract the ZIP file
+3. Open Chrome and navigate to `chrome://extensions`
+4. Enable "Developer mode" (toggle in top right)
+5. Click "Load unpacked"
+6. Select the extracted extension directory
 
 ## Documentation
 

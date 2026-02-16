@@ -1,0 +1,11 @@
+# Screenshots Directory
+
+Screenshot files will be added here following the naming convention in ../README.md:
+- 01-default-view.png
+- 02-reorder-modal.png
+- 03-reordered-list.png
+- 04-order-viewer.png (optional)
+- 05-consensus-viz.png (optional)
+
+Screenshots must be taken manually using the extension loaded on a real GitHub PR.
+See ../README.md for detailed instructions.
