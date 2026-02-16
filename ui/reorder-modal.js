@@ -782,11 +782,97 @@ function setupDragAndDrop(list, callbacks) {
 
 /**
  * Setup keyboard navigation
+ * Group 12: Enhanced keyboard navigation with drag mode
  * @param {HTMLElement} list - File list element
  */
 function setupKeyboardNavigation(list) {
   // Get modal for ARIA announcements
   const modal = list.closest('.pr-reorder-modal');
+
+  // Track drag mode state
+  let dragModeItem = null;
+  let dragModeOriginalPosition = null;
+
+  /**
+   * Task 12.1, 12.2, 12.3: Enter drag mode
+   */
+  function enterDragMode(item) {
+    dragModeItem = item;
+    const items = Array.from(list.children);
+    dragModeOriginalPosition = items.indexOf(item);
+
+    // Task 12.2: Add visual indication for drag mode
+    item.classList.add('pr-reorder-drag-mode');
+    item.setAttribute('aria-grabbed', 'true');
+
+    // Task 12.3: Announce to screen readers
+    if (modal) {
+      announceToScreenReader(
+        'Drag mode activated. Use arrow keys to move, Space to drop, Escape to cancel.',
+        'assertive',
+        modal
+      );
+    }
+  }
+
+  /**
+   * Task 12.7, 12.8: Exit drag mode (cancel)
+   */
+  function cancelDragMode() {
+    if (!dragModeItem) return;
+
+    // Return to original position
+    const items = Array.from(list.children);
+    const currentIndex = items.indexOf(dragModeItem);
+
+    if (currentIndex !== dragModeOriginalPosition) {
+      // Move back to original position
+      if (dragModeOriginalPosition === 0) {
+        list.prepend(dragModeItem);
+      } else {
+        items[dragModeOriginalPosition].before(dragModeItem);
+      }
+      updateAriaLabels(list);
+    }
+
+    // Remove visual indication
+    dragModeItem.classList.remove('pr-reorder-drag-mode');
+    dragModeItem.removeAttribute('aria-grabbed');
+
+    // Task 12.8: Announce cancellation
+    if (modal) {
+      announceToScreenReader('Drag cancelled', 'assertive', modal);
+    }
+
+    dragModeItem = null;
+    dragModeOriginalPosition = null;
+  }
+
+  /**
+   * Task 12.5, 12.6: Complete drop
+   */
+  function completeDrop() {
+    if (!dragModeItem) return;
+
+    const items = Array.from(list.children);
+    const newPosition = items.indexOf(dragModeItem) + 1;
+
+    // Remove visual indication
+    dragModeItem.classList.remove('pr-reorder-drag-mode');
+    dragModeItem.removeAttribute('aria-grabbed');
+
+    // Task 12.6: Announce completion
+    if (modal) {
+      announceToScreenReader(
+        `Dropped at position ${newPosition} of ${items.length}`,
+        'assertive',
+        modal
+      );
+    }
+
+    dragModeItem = null;
+    dragModeOriginalPosition = null;
+  }
 
   list.addEventListener('keydown', (e) => {
     const item = e.target.closest('.pr-reorder-file-item');
@@ -798,50 +884,98 @@ function setupKeyboardNavigation(list) {
     let handled = false;
     let newPosition = null;
 
-    // Move up (Ctrl+↑ or Cmd+↑)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') {
-      if (index > 0) {
+    // Task 12.1: Enter key activates drag mode
+    if (e.key === 'Enter' && !dragModeItem) {
+      enterDragMode(item);
+      handled = true;
+    }
+
+    // Task 12.5: Space key completes drop
+    if (e.key === ' ' && dragModeItem === item) {
+      e.preventDefault(); // Prevent page scroll
+      completeDrop();
+      handled = true;
+    }
+
+    // Task 12.7: Escape key cancels drag mode
+    if (e.key === 'Escape' && dragModeItem === item) {
+      cancelDragMode();
+      handled = true;
+    }
+
+    // Task 12.4: Arrow keys in drag mode move the item
+    if (dragModeItem === item) {
+      if (e.key === 'ArrowUp' && index > 0) {
         items[index - 1].before(item);
         item.focus();
         updateAriaLabels(list);
-        newPosition = index; // New position (0-indexed)
+        newPosition = index; // New position (1-based for announcement)
         handled = true;
       }
-    }
 
-    // Move down (Ctrl+↓ or Cmd+↓)
-    if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowDown') {
-      if (index < items.length - 1) {
+      if (e.key === 'ArrowDown' && index < items.length - 1) {
         items[index + 1].after(item);
         item.focus();
         updateAriaLabels(list);
-        newPosition = index + 2; // New position (0-indexed)
+        newPosition = index + 2; // New position (1-based for announcement)
         handled = true;
       }
-    }
 
-    // Announce position change to screen readers
-    if (newPosition !== null && modal) {
-      announceToScreenReader(
-        `Moved to position ${newPosition} of ${items.length}`,
-        'assertive',
-        modal
-      );
-    }
-
-    // Navigate up (↑)
-    if (!e.ctrlKey && !e.metaKey && e.key === 'ArrowUp') {
-      if (index > 0) {
-        items[index - 1].focus();
-        handled = true;
+      // Announce position during drag mode
+      if (newPosition !== null && modal) {
+        announceToScreenReader(
+          `Position ${newPosition} of ${items.length}`,
+          'assertive',
+          modal
+        );
       }
-    }
+    } else {
+      // Task 12.9: Ensure existing Ctrl/Cmd shortcuts still work
+      // Move up (Ctrl+↑ or Cmd+↑)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowUp') {
+        if (index > 0) {
+          items[index - 1].before(item);
+          item.focus();
+          updateAriaLabels(list);
+          newPosition = index; // New position (0-indexed)
+          handled = true;
+        }
+      }
 
-    // Navigate down (↓)
-    if (!e.ctrlKey && !e.metaKey && e.key === 'ArrowDown') {
-      if (index < items.length - 1) {
-        items[index + 1].focus();
-        handled = true;
+      // Move down (Ctrl+↓ or Cmd+↓)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'ArrowDown') {
+        if (index < items.length - 1) {
+          items[index + 1].after(item);
+          item.focus();
+          updateAriaLabels(list);
+          newPosition = index + 2; // New position (0-indexed)
+          handled = true;
+        }
+      }
+
+      // Announce position change for Ctrl/Cmd shortcuts
+      if (newPosition !== null && modal) {
+        announceToScreenReader(
+          `Moved to position ${newPosition} of ${items.length}`,
+          'assertive',
+          modal
+        );
+      }
+
+      // Navigate up (↑) - only when not in drag mode
+      if (!e.ctrlKey && !e.metaKey && e.key === 'ArrowUp') {
+        if (index > 0) {
+          items[index - 1].focus();
+          handled = true;
+        }
+      }
+
+      // Navigate down (↓) - only when not in drag mode
+      if (!e.ctrlKey && !e.metaKey && e.key === 'ArrowDown') {
+        if (index < items.length - 1) {
+          items[index + 1].focus();
+          handled = true;
+        }
       }
     }
 
