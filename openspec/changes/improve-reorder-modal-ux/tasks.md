@@ -130,22 +130,22 @@
 
 ## 14. Accessibility - Screen Reader Support
 
-- [ ] 14.1 Update file item aria-labels to include position ("path, position X of Y")
-- [ ] 14.2 Update aria-labels after reordering
-- [ ] 14.3 Add aria-label to search input ("Search files")
-- [ ] 14.4 Add aria-label to clear button ("Clear search")
-- [ ] 14.5 Add aria-label to close button ("Close modal")
-- [ ] 14.6 Add aria-disabled="true" to disabled buttons
-- [ ] 14.7 Announce empty state messages to screen readers
-- [ ] 14.8 Ensure preset dropdown has associated label (for attribute)
+- [x] 14.1 Update file item aria-labels to include position ("path, position X of Y")
+- [x] 14.2 Update aria-labels after reordering
+- [x] 14.3 Add aria-label to search input ("Search files")
+- [x] 14.4 Add aria-label to clear button ("Clear search")
+- [x] 14.5 Add aria-label to close button ("Close modal")
+- [x] 14.6 Add aria-disabled="true" to disabled buttons
+- [x] 14.7 Announce empty state messages to screen readers
+- [x] 14.8 Ensure preset dropdown has associated label (for attribute)
 
 ## 15. Accessibility - Color Contrast
 
-- [ ] 15.1 Verify all text meets 4.5:1 contrast ratio (WCAG AA)
-- [ ] 15.2 Verify interactive elements meet 3:1 contrast ratio
-- [ ] 15.3 Verify focus indicators meet 3:1 contrast against background
-- [ ] 15.4 Test contrast in both light and dark modes
-- [ ] 15.5 Ensure highlights and color-coded elements have sufficient contrast
+- [x] 15.1 Verify all text meets 4.5:1 contrast ratio (WCAG AA)
+- [x] 15.2 Verify interactive elements meet 3:1 contrast ratio
+- [x] 15.3 Verify focus indicators meet 3:1 contrast against background
+- [x] 15.4 Test contrast in both light and dark modes
+- [x] 15.5 Ensure highlights and color-coded elements have sufficient contrast
 
 ## 16. Responsive Design
 
