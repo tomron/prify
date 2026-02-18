@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PR File Reorder",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Collaborative file ordering in GitHub Pull Requests to improve code review efficiency",
   "permissions": ["storage"],
   "host_permissions": ["https://github.com/*"],
