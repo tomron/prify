@@ -42,10 +42,10 @@ async function convertSvgToPng(inputPath, outputPath) {
     // Draw SVG centered with padding
     ctx.drawImage(
       image,
-      PADDING,  // x position
-      PADDING,  // y position
-      CONTENT_SIZE,  // width
-      CONTENT_SIZE   // height
+      PADDING, // x position
+      PADDING, // y position
+      CONTENT_SIZE, // width
+      CONTENT_SIZE // height
     );
 
     // Write PNG to output
@@ -74,7 +74,9 @@ if (args.length !== 2) {
   console.error('Usage: node scripts/svg-to-png.js <input.svg> <output.png>');
   console.error('');
   console.error('Example:');
-  console.error('  node scripts/svg-to-png.js icons/icon.svg store/icons/icon128.png');
+  console.error(
+    '  node scripts/svg-to-png.js icons/icon.svg store/icons/icon128.png'
+  );
   process.exit(1);
 }
 
