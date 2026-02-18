@@ -14,7 +14,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "build": "rollup -c",
-    "build:watch": "rollup -c -w"
+    "build:watch": "rollup -c -w",
+    "icons:generate": "bash scripts/generate-icons.sh",
+    "icons:convert": "node scripts/svg-to-png.js"
   },
   "keywords": [
     "chrome-extension",
@@ -30,6 +32,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/chrome": "^0.0.260",
     "@types/jest": "^29.5.11",
+    "canvas": "^2.11.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "jest": "^29.7.0",
